@@ -17,6 +17,9 @@ final class NotificationService: UNNotificationServiceExtension {
                   let sealed = OpiCrypto.base64urlDecode(c),
                   let data = try? OpiCrypto.open(sealed, using: PairingKeys.shared.encKey),
                   let payload = try? JSONDecoder().decode(NotifPayload.self, from: data) else { return }
+            if let bt = payload.bt {
+                SharedStore().saveStatus(PhoneStatus(bt: bt, bc: payload.bc ?? false, at: Date()))
+            }
             await Categories.ensureRegistered(for: payload)
             bestAttempt = NotificationContent.make(for: payload)
         }

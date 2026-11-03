@@ -53,6 +53,9 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
               let remove = try? JSONDecoder().decode(RemovePayload.self, from: data) else {
             return .noData
         }
+        if let bt = remove.bt {
+            SharedStore().saveStatus(PhoneStatus(bt: bt, bc: remove.bc ?? false, at: Date()))
+        }
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [remove.i])
         AppModel.shared.remove(id: remove.i)
         return .newData
@@ -99,7 +102,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             return
         }
         // Default tap: open the detail view.
-        AppModel.shared.selectedId = id
+        AppModel.shared.openNotification(id: id)
     }
 }
 

@@ -87,6 +87,9 @@ fun SetupScreen() {
     var permissionsGranted by remember { mutableStateOf(false) }
     var listenerEnabled by remember { mutableStateOf(false) }
     var batteryExempt by remember { mutableStateOf(false) }
+    var calendarGranted by remember { mutableStateOf(false) }
+    var calendarApps by remember { mutableStateOf(emptyList<String>()) }
+    var ringing by remember { mutableStateOf(false) }
     var paired by remember { mutableStateOf(PairingStore.isPaired(context)) }
     var showOppoTips by remember { mutableStateOf(false) }
     var confirmUnpair by remember { mutableStateOf(false) }
@@ -104,6 +107,9 @@ fun SetupScreen() {
         batteryExempt = context.getSystemService(PowerManager::class.java)
             ?.isIgnoringBatteryOptimizations(context.packageName) == true
         paired = PairingStore.isPaired(context)
+        calendarGranted = CalendarSync.hasPermission(context)
+        calendarApps = if (calendarGranted) CalendarApps.labels(context) else emptyList()
+        ringing = FindPhone.ringing.value
         // Recover the link service if it wasn't allowed to start in the background.
         if (paired && permissionsGranted) LinkService.start(context)
     }
@@ -126,6 +132,19 @@ fun SetupScreen() {
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { refresh() }
+
+    val calendarLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) {
+        refresh()
+        if (it) CalendarSync.sendUpdates()
+    }
+
+    // Opening the app while the phone rings stops it.
+    LaunchedEffect(Unit) {
+        if (FindPhone.ringing.value) FindPhone.stop(context)
+        FindPhone.ringing.collect { ringing = it }
+    }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { padding ->
         Column(
@@ -229,7 +248,37 @@ fun SetupScreen() {
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("5. Status", fontWeight = FontWeight.Bold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("6. Calendar (optional)", fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(if (calendarGranted) "✓" else "")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (calendarGranted) {
+                        Text(
+                            "Watch shows the next 30 days and reminds you. " +
+                                "Calendar app notifications aren't forwarded — the watch reminds you itself." +
+                                if (calendarApps.isNotEmpty()) " Detected: ${calendarApps.joinToString()}" else "",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    } else {
+                        Text(
+                            "Powers the watch calendar and on-wrist reminders.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(onClick = {
+                            calendarLauncher.launch(Manifest.permission.READ_CALENDAR)
+                        }) {
+                            Text("Grant calendar access")
+                        }
+                    }
+                }
+            }
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("7. Status", fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "Watch link: " + when (watchLink) {
@@ -244,6 +293,12 @@ fun SetupScreen() {
                             "Relay: ${it.text}",
                             style = MaterialTheme.typography.bodySmall,
                         )
+                    }
+                    if (ringing) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { FindPhone.stop(context) }) {
+                            Text("Stop ringing")
+                        }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedButton(

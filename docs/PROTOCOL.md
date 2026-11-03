@@ -81,6 +81,9 @@ identifier.
 
 **Removal payload** (plaintext): `{"i":"<id>"}`.
 
+Both payloads may optionally carry `"bt"` (phone battery 0–100) and `"bc"` (charging bool)
+so pushes keep the watch's battery display fresh even over APNs.
+
 **Size limit:** APNs alert payloads are capped at 4096 bytes. Before sealing for a relay push,
 Android truncates `b` so that `base64url(sealed(payload)).length <= 3000` (which is also the
 relay's hard limit on `c`).
@@ -125,6 +128,11 @@ Watch → phone:
 | `ack`     | `{"type":"ack","id":"<id>"}` | received `notif` |
 | `dismiss` | `{"type":"dismiss","id":"<id>"}` | user dismissed on watch → cancel on Android |
 | `action`  | `{"type":"action","id":"<id>","idx":<int>,"label":"<label>","text":"<string>"?}` | run Android action `idx`; `text` fills RemoteInput |
+| `findphone` | `{"type":"findphone","on":<bool>}` | start/stop ringing the phone |
+| `media`   | `{"type":"media","cmd":"toggle"\|"play"\|"pause"\|"next"\|"prev"\|"vol","v":<0.0-1.0>?}` | media control; `v` only with `vol` |
+
+`hello` additionally accepts an optional `"cal":"<h>"` field: the hash of the calendar the
+watch has cached (omit when it has none).
 
 Phone → watch:
 
@@ -134,6 +142,27 @@ Phone → watch:
 | `notif`   | `{"type":"notif", ...notification payload fields (i,p,a,t,b,w,x)...}` | new/updated notification |
 | `remove`  | `{"type":"remove","id":"<id>"}` | notification cancelled on Android |
 | `sync`    | `{"type":"sync","ids":["<id>",...]}` | ids currently active on Android; sent right after `welcome` |
+| `status`  | `{"type":"status","bt":<0-100>,"bc":<bool>}` | phone battery level + charging |
+| `media_state` | `{"type":"media_state","on":<bool>,"app":"<label>","t":"<title>","ar":"<artist>","pl":<bool>,"v":<0-1>}` | media session state; strings may be empty when `on=false`; `v` = music stream volume |
+| `findphone_state` | `{"type":"findphone_state","on":<bool>}` | whether the phone is currently ringing |
+| `cal`     | `{"type":"cal","h":"<hash>","from":<ms>,"to":<ms>,"ev":[...]}` | calendar events, see below |
+
+### Calendar (`cal` message)
+
+`ev` is a list of event objects (max 300, sorted by `s` then `k`):
+
+```json
+{"k":"<key>","t":"<title>","s":<startMs>,"e":<endMs>,"ad":<bool allDay>,"loc":"<location>",
+ "n":"<notes>","cal":"<calendar name>","col":<int ARGB>,"rm":[<minutes before>...]}
+```
+
+- `k` = first 16 chars of `base64url(sha256(utf8("<eventId>|<beginMs>")))`.
+- `t` ≤ 200 code points, `n` ≤ 300, `loc` ≤ 200. `rm` = distinct reminder minutes, sorted.
+- `h` = first 16 chars of `base64url(sha256(utf8(<exact JSON string of the ev array as sent>)))`.
+  The watch treats it as opaque and echoes it in `hello.cal`.
+- All-day events: Android stores them at UTC midnight; `s`/`e` are sent as-is with `ad:true`.
+  The watch interprets all-day dates in UTC (display the date only) and computes reminder
+  times from the LOCAL midnight of that UTC calendar date.
 
 Rules:
 
@@ -141,7 +170,14 @@ Rules:
   parses). This makes AES-GCM with `encKey` the mutual authentication — no Bluetooth bonding,
   no system pairing dialog.
 - The phone ignores anything that fails to decrypt.
-- On `hello` the phone replies `welcome`, then `sync`.
+- On `hello` the phone replies, in order: `welcome`, `sync`, `status`, `media_state`,
+  `cal` (only if the current `h` differs from `hello.cal`, and only when the calendar
+  permission is granted), and `findphone_state` (only if currently ringing).
+- While authenticated the phone pushes updates: `status` whenever battery level or
+  charging changes; `media_state` on metadata/playback changes and after any `media`
+  command (debounced 300 ms); `cal` when the calendar provider changes and the new `h`
+  differs from the last `h` sent to that connection (debounced 3 s);
+  `findphone_state` on change.
 - The phone sends `notif`/`remove` one at a time over BLE, waiting for the notification-sent
   callback before the next write; the watch `ack`s each `notif`. If no ack within ~3 s the
   phone falls back to the relay for that notification.

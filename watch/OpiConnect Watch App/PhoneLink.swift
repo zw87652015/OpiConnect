@@ -26,6 +26,13 @@ final class PhoneLink: NSObject, ObservableObject {
     private var running = false
     private var workItems: [DispatchWorkItem] = []
 
+    private var lastInboundAt = Date.distantPast
+
+    // True when no message has been received for `seconds` (used by background refresh).
+    func inboundIdle(_ seconds: TimeInterval) -> Bool {
+        Date().timeIntervalSince(lastInboundAt) >= seconds
+    }
+
     private let reassembler = Reassembler()
     private var chunkQueue: [Data] = []       // chunks of the message being written
     private var messageQueue: [Data] = []     // sealed messages waiting / in flight
@@ -143,7 +150,18 @@ final class PhoneLink: NSObject, ObservableObject {
         case .sync(let ids):
             Task { await Self.syncDelivered(ids: Set(ids)) }
             AppModel.shared.sync(ids: Set(ids))
-        default:
+        case .status(let bt, let bc):
+            AppModel.shared.updateStatus(bt: bt, bc: bc)
+        case .mediaState(let snapshot):
+            AppModel.shared.media = snapshot
+            AppModel.shared.store.saveMedia(snapshot)
+        case .findphoneState(let on):
+            AppModel.shared.ringing = on
+        case .cal(let cache):
+            AppModel.shared.calendar = cache
+            AppModel.shared.store.saveCalendar(cache)
+            Task { await CalendarReminders.reschedule(events: cache.events) }
+        case .hello, .state, .ack, .dismiss, .action, .findphone, .media:
             break
         }
     }
@@ -274,8 +292,9 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
             if error != nil { dropPeripheral(reject: true) }
             return
         }
-        // Channel is up: authenticate.
-        send(.hello(state: appState))
+        // Channel is up: authenticate (echo cached calendar hash so the phone only
+        // resends the calendar when it changed).
+        send(.hello(state: appState, cal: AppModel.shared.calendar?.h))
         after(5) { [weak self] in
             guard let self, self.status != .authenticated else { return }
             self.dropPeripheral(reject: true)
@@ -307,6 +326,7 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
         guard let sealed = reassembler.push(data) else { return }
         guard let plaintext = try? OpiCrypto.open(sealed, using: PairingKeys.shared.encKey),
               let message = BLEMessage.decode(plaintext) else { return }
+        lastInboundAt = Date()
         handle(message)
     }
 }

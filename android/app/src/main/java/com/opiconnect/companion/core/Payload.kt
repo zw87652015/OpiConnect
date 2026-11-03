@@ -17,16 +17,22 @@ data class NotifPayload(
     val b: String,
     val w: Long,
     val x: List<ActionInfo>,
+    val bt: Int? = null,    // phone battery 0-100 (keeps the watch fresh over APNs too)
+    val bc: Boolean? = null, // phone charging
 ) {
-    fun toJson(): String = JSONObject()
-        .put("i", i)
-        .put("p", p)
-        .put("a", a)
-        .put("t", t)
-        .put("b", b)
-        .put("w", w)
-        .put("x", JSONArray().apply { x.forEach { put(it.toJson()) } })
-        .toString()
+    fun toJson(): String {
+        val o = JSONObject()
+            .put("i", i)
+            .put("p", p)
+            .put("a", a)
+            .put("t", t)
+            .put("b", b)
+            .put("w", w)
+            .put("x", JSONArray().apply { x.forEach { put(it.toJson()) } })
+        if (bt != null) o.put("bt", bt)
+        if (bc != null) o.put("bc", bc)
+        return o.toString()
+    }
 
     companion object {
         fun fromJson(s: String): NotifPayload? = runCatching {
@@ -47,6 +53,8 @@ data class NotifPayload(
                 b = o.getString("b"),
                 w = o.getLong("w"),
                 x = actions,
+                bt = if (o.has("bt")) o.getInt("bt") else null,
+                bc = if (o.has("bc")) o.getBoolean("bc") else null,
             )
         }.getOrNull()
     }
@@ -100,11 +108,13 @@ object Messages {
     sealed interface In
 
     // watch -> phone (inbound for us)
-    data class Hello(val state: String) : In
+    data class Hello(val state: String, val cal: String? = null) : In
     data class State(val state: String) : In
     data class Ack(val id: String) : In
     data class Dismiss(val id: String) : In
     data class Action(val id: String, val idx: Int, val label: String, val text: String?) : In
+    data class FindPhone(val on: Boolean) : In
+    data class MediaCmd(val cmd: String, val v: Float?) : In
 
     // phone -> watch (outbound for us)
     object Welcome : Out { override fun toJson() = JSONObject().put("type", "welcome") }
@@ -117,11 +127,30 @@ object Messages {
     data class Sync(val ids: List<String>) : Out {
         override fun toJson() = JSONObject().put("type", "sync").put("ids", JSONArray(ids))
     }
+    data class Status(val bt: Int, val bc: Boolean) : Out {
+        override fun toJson() = JSONObject().put("type", "status").put("bt", bt).put("bc", bc)
+    }
+    data class MediaState(
+        val on: Boolean, val app: String, val t: String, val ar: String,
+        val pl: Boolean, val v: Float,
+    ) : Out {
+        override fun toJson() = JSONObject().put("type", "media_state")
+            .put("on", on).put("app", app).put("t", t).put("ar", ar)
+            .put("pl", pl).put("v", v.toDouble())
+    }
+    data class FindPhoneState(val on: Boolean) : Out {
+        override fun toJson() = JSONObject().put("type", "findphone_state").put("on", on)
+    }
+    data class Cal(val msg: CalMessage) : Out {
+        override fun toJson() = JSONObject()
+            .put("type", "cal").put("h", msg.h).put("from", msg.from).put("to", msg.to)
+            .put("ev", JSONArray(msg.evJson))
+    }
 
     fun parse(data: ByteArray): In? = runCatching {
         val o = JSONObject(String(data, Charsets.UTF_8))
         when (o.getString("type")) {
-            "hello" -> Hello(o.getString("state"))
+            "hello" -> Hello(o.getString("state"), if (o.has("cal")) o.getString("cal") else null)
             "state" -> State(o.getString("state"))
             "ack" -> Ack(o.getString("id"))
             "dismiss" -> Dismiss(o.getString("id"))
@@ -130,6 +159,11 @@ object Messages {
                 idx = o.getInt("idx"),
                 label = o.getString("label"),
                 text = if (o.has("text")) o.getString("text") else null,
+            )
+            "findphone" -> FindPhone(o.getBoolean("on"))
+            "media" -> MediaCmd(
+                cmd = o.getString("cmd"),
+                v = if (o.has("v")) o.getDouble("v").toFloat() else null,
             )
             else -> null
         }

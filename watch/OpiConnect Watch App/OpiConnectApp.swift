@@ -11,6 +11,7 @@ struct OpiConnectApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(model)
+                .onOpenURL { model.open(url: $0) }
         }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
@@ -25,10 +26,19 @@ struct OpiConnectApp: App {
             }
         }
         .backgroundTask(.appRefresh(AppDelegate.refreshTaskId)) {
-            // Reconnect briefly to flush queued dismiss/action messages.
-            if PendingQueue.shared.count > 0 {
+            // Reconnect when paired: flush queued messages and pick up fresh
+            // battery/calendar/media state (welcome + inbound burst, ~3 s quiet).
+            if model.paired {
                 await PhoneLink.shared.start(state: "background")
-                try? await Task.sleep(for: .seconds(20))
+                let deadline = Date().addingTimeInterval(20)
+                // Wait for the welcome + inbound burst (status/media/cal), then ~3 s of
+                // silence with an empty outbound queue, capped at 20 s total.
+                while Date() < deadline {
+                    if await PhoneLink.shared.status == .authenticated,
+                       await PhoneLink.shared.inboundIdle(3),
+                       PendingQueue.shared.count == 0 { break }
+                    try? await Task.sleep(for: .seconds(0.5))
+                }
                 await PhoneLink.shared.disconnect()
             }
             await AppDelegate.scheduleNextRefresh()

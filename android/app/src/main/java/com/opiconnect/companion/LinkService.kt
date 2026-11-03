@@ -83,6 +83,7 @@ class LinkService : Service() {
         var cccdEnabled = false
         var authenticated = false
         var watchState = ""
+        var lastCalHash: String? = null   // hash from hello.cal, then last sent
         val reassembler = Reassembler()
         val messages = ConcurrentLinkedQueue<List<ByteArray>>() // one entry per message (its chunks)
         @Volatile var chunkIndex = 0
@@ -107,6 +108,9 @@ class LinkService : Service() {
         instance = this
         createChannel()
         registerReceiver(adapterReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+        PhoneStatus.register(this)
+        MediaBridge.start(this)
+        CalendarSync.start(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -124,6 +128,9 @@ class LinkService : Service() {
         instance = null
         handler.removeCallbacksAndMessages(null)
         runCatching { unregisterReceiver(adapterReceiver) }
+        PhoneStatus.unregister(this)
+        MediaBridge.stop(this)
+        CalendarSync.stop(this)
         stopAdvertising()
         gattServer?.close()
         gattServer = null
@@ -323,8 +330,17 @@ class LinkService : Service() {
             if (msg is Messages.Hello) {
                 conn.authenticated = true
                 conn.watchState = msg.state
+                conn.lastCalHash = msg.cal
                 send(conn, Messages.Welcome)
                 send(conn, Messages.Sync(Router.activeIds()))
+                // Per PROTOCOL: status, media_state, cal (if hash differs),
+                // findphone_state (if ringing) — in this order.
+                val snap = PhoneStatus.current()
+                if (snap.bt >= 0) send(conn, Messages.Status(snap.bt, snap.bc))
+                val ms = MediaBridge.state.value
+                send(conn, Messages.MediaState(ms.on, ms.app, ms.title, ms.artist, ms.playing, ms.volume))
+                sendCalTo(conn)
+                if (FindPhone.ringing.value) send(conn, Messages.FindPhoneState(true))
                 updateAppState()
             }
             return
@@ -334,6 +350,8 @@ class LinkService : Service() {
             is Messages.Ack -> Router.onAck(msg.id)
             is Messages.Dismiss -> ActionExecutor.dismiss(msg.id)
             is Messages.Action -> ActionExecutor.run(msg.id, msg.idx, msg.label, msg.text)
+            is Messages.FindPhone -> FindPhone.set(this@LinkService, msg.on)
+            is Messages.MediaCmd -> MediaBridge.command(msg.cmd, msg.v)
             else -> {}
         }
     }
@@ -358,6 +376,24 @@ class LinkService : Service() {
         conns.values.map { send(it, msg) }.any { it }
 
     fun anyAuthenticated(): Boolean = conns.values.any { it.authenticated }
+
+    // Sends cal to every authenticated connection whose last-known hash differs.
+    fun sendCal(msg: com.opiconnect.companion.core.CalMessage) {
+        conns.values.forEach { conn ->
+            if (conn.authenticated && conn.lastCalHash != msg.h) {
+                if (send(conn, Messages.Cal(msg))) conn.lastCalHash = msg.h
+            }
+        }
+    }
+
+    private fun sendCalTo(conn: Conn) {
+        if (!CalendarSync.hasPermission(this)) return
+        // Rebuild on every hello: the 30-day window moves even when no event changes.
+        val msg = CalendarSync.build(this) ?: return
+        if (conn.lastCalHash != msg.h) {
+            if (send(conn, Messages.Cal(msg))) conn.lastCalHash = msg.h
+        }
+    }
 
     // First connection with an active watch (per Router's delivery rule).
     fun activeWatch(): Conn? =

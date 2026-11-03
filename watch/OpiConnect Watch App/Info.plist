@@ -37,5 +37,14 @@
 	<string>$(RELAY_URL)</string>
 	<key>OpiAppGroup</key>
 	<string>$(APP_GROUP)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>opiconnect</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

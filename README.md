@@ -28,6 +28,21 @@ pair id, and the APNs token. See `docs/PROTOCOL.md` for the wire spec and
 Watch → Android traffic (dismissals, actions) travels over BLE while the watch app is
 connected; otherwise it's queued on the watch and sent when it next connects.
 
+## Features
+
+- Notification mirroring (BLE when the watch app is open, encrypted APNs otherwise)
+- Dismiss sync both directions + Android notification actions (incl. text replies)
+- **Find my phone** — ring the phone from the watch (max alarm volume + vibration)
+- **Music control** — play/pause/next/prev + Digital Crown volume
+- **Phone battery on the watch** — status line plus a complication; stays fresh via
+  pushes (every push carries the battery level) and background refresh
+- **Calendar sync** — next 30 days of events mirrored to the watch with on-wrist
+  reminders; calendar app notifications are not forwarded to avoid double alerts
+- **Complications** — phone battery, next event, Find Phone and Music quick-launch
+
+Adding complications: long-press the watch face → Edit → Complications → pick a slot →
+OpiConnect. They're also available in the Smart Stack.
+
 ## Limitations
 
 - **BLE only while the watch app is open.** watchOS severely caps background BLE
@@ -92,7 +107,9 @@ fine — Windows works), or clone the repo there. Set your relay URL in
 Unit tests: `gradlew.bat :app:testDebugUnitTest`.
 
 Walk through the in-app setup cards: grant Bluetooth + notification permissions,
-enable notification access, allow the battery exemption. **OPPO/ColorOS:** also
+enable notification access, allow the battery exemption, and optionally grant
+**calendar access** (powers the watch calendar + reminders — skipped if denied).
+**OPPO/ColorOS:** also
 enable *Battery > App battery management > OpiConnect > allow background activity*
 and *auto launch*, and lock OpiConnect in Recents so ColorOS doesn't kill it.
 

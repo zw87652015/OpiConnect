@@ -57,8 +57,11 @@ object Router {
             val sentBle = link != null && link.anyAuthenticated() && link.sendAll(Messages.Remove(id))
             if (!sentBle) {
                 val keys = keys() ?: return@launch
+                val o = JSONObject().put("i", id)
+                val snap = PhoneStatus.current()
+                if (snap.bt >= 0) o.put("bt", snap.bt).put("bc", snap.bc)
                 val sealed = Crypto.base64url(
-                    Crypto.seal(JSONObject().put("i", id).toString().toByteArray(Charsets.UTF_8), keys.encKey),
+                    Crypto.seal(o.toString().toByteArray(Charsets.UTF_8), keys.encKey),
                 )
                 RelayClient.push(keys, "remove", id, sealed)
             }
@@ -117,8 +120,13 @@ object Router {
     private fun keys() = OpiListenerService.instance?.let { PairingStore.keys(it) }
 
     private fun passesFilter(sbn: StatusBarNotification): Boolean {
-        if (sbn.packageName == OpiListenerService.instance?.packageName) return false
+        val context = OpiListenerService.instance
+        if (sbn.packageName == context?.packageName) return false
         if (sbn.isOngoing) return false
+        // Calendar apps: when watch reminders are active, their notifications would duplicate.
+        if (context != null && CalendarSync.hasPermission(context) &&
+            sbn.packageName in CalendarApps.packages(context)
+        ) return false
         val flags = sbn.notification.flags
         if (flags and Notification.FLAG_GROUP_SUMMARY != 0) return false
         if (flags and Notification.FLAG_FOREGROUND_SERVICE != 0) return false
@@ -154,6 +162,8 @@ object Router {
             b = body,
             w = sbn.postTime,
             x = actions,
+            bt = PhoneStatus.current().bt.takeIf { it >= 0 },
+            bc = PhoneStatus.current().bc,
         )
     }
 

@@ -10,6 +10,7 @@
 		CA7E00000000000000000011 /* NotificationService.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CA7E00000000000000000040 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CA7E00000000000000000012 /* OpiConnect Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = CA7E00000000000000000030 /* OpiConnect Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CA7E00000000000000000013 /* QRCodeGenerator in Frameworks */ = {isa = PBXBuildFile; productRef = CA7E00000000000000000014 /* QRCodeGenerator */; };
+		CA7E00000000000000000015 /* OpiConnectWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CA7E00000000000000000041 /* OpiConnectWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,13 @@
 			remoteGlobalIDString = CA7E00000000000000000002;
 			remoteInfo = "OpiConnect Watch App";
 		};
+		CA7E00000000000000000023 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA7E00000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA7E00000000000000000005;
+			remoteInfo = OpiConnectWidgets;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,6 +63,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				CA7E00000000000000000011 /* NotificationService.appex in Embed App Extensions */,
+				CA7E00000000000000000015 /* OpiConnectWidgets.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +74,7 @@
 		CA7E00000000000000000030 /* OpiConnect Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpiConnect Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA7E00000000000000000031 /* OpiConnect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpiConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA7E00000000000000000040 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA7E00000000000000000041 /* OpiConnectWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpiConnectWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA7E00000000000000000050 /* OpiConnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpiConnectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA7E00000000000000000060 /* OpiConnect.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = OpiConnect.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -74,7 +84,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				OpiConnect.entitlements,
 			);
 			target = CA7E00000000000000000002 /* OpiConnect Watch App */;
 		};
@@ -82,9 +91,16 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				NotificationService.entitlements,
 			);
 			target = CA7E00000000000000000003 /* NotificationService */;
+		};
+		CA7E00000000000000000073 /* Exceptions for "OpiConnectWidgets" folder in "OpiConnectWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				OpiConnectWidgets.entitlements,
+			);
+			target = CA7E00000000000000000005 /* OpiConnectWidgets */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -120,6 +136,14 @@
 			path = OpiConnectTests;
 			sourceTree = "<group>";
 		};
+		CA7E00000000000000000085 /* OpiConnectWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CA7E00000000000000000073 /* Exceptions for "OpiConnectWidgets" folder in "OpiConnectWidgets" target */,
+			);
+			path = OpiConnectWidgets;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +176,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA7E000000000000000000A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -163,6 +194,7 @@
 				CA7E00000000000000000081 /* OpiConnect Watch App */,
 				CA7E00000000000000000082 /* NotificationService */,
 				CA7E00000000000000000083 /* Shared */,
+				CA7E00000000000000000085 /* OpiConnectWidgets */,
 				CA7E00000000000000000084 /* OpiConnectTests */,
 				CA7E000000000000000000E1 /* Products */,
 			);
@@ -174,6 +206,7 @@
 				CA7E00000000000000000031 /* OpiConnect.app */,
 				CA7E00000000000000000030 /* OpiConnect Watch App.app */,
 				CA7E00000000000000000040 /* NotificationService.appex */,
+				CA7E00000000000000000041 /* OpiConnectWidgets.appex */,
 				CA7E00000000000000000050 /* OpiConnectTests.xctest */,
 			);
 			name = Products;
@@ -219,6 +252,7 @@
 			);
 			dependencies = (
 				CA7E000000000000000000F2 /* PBXTargetDependency */,
+				CA7E000000000000000000F4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				CA7E00000000000000000081 /* OpiConnect Watch App */,
@@ -278,6 +312,29 @@
 			productReference = CA7E00000000000000000050 /* OpiConnectTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		CA7E00000000000000000005 /* OpiConnectWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA7E000000000000000000B5 /* Build configuration list for PBXNativeTarget "OpiConnectWidgets" */;
+			buildPhases = (
+				CA7E000000000000000000C5 /* Sources */,
+				CA7E000000000000000000A4 /* Frameworks */,
+				CA7E000000000000000000D5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CA7E00000000000000000085 /* OpiConnectWidgets */,
+				CA7E00000000000000000083 /* Shared */,
+			);
+			name = OpiConnectWidgets;
+			packageProductDependencies = (
+			);
+			productName = OpiConnectWidgets;
+			productReference = CA7E00000000000000000041 /* OpiConnectWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -300,6 +357,9 @@
 					CA7E00000000000000000004 = {
 						CreatedOnToolsVersion = 27.1;
 						TestTargetID = CA7E00000000000000000002;
+					};
+					CA7E00000000000000000005 = {
+						CreatedOnToolsVersion = 27.1;
 					};
 				};
 			};
@@ -324,6 +384,7 @@
 				CA7E00000000000000000002 /* OpiConnect Watch App */,
 				CA7E00000000000000000003 /* NotificationService */,
 				CA7E00000000000000000004 /* OpiConnectTests */,
+				CA7E00000000000000000005 /* OpiConnectWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -351,6 +412,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CA7E000000000000000000D4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000D5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -388,6 +456,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA7E000000000000000000C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -406,6 +481,11 @@
 			name = "OpiConnect Watch App";
 			target = CA7E00000000000000000002 /* OpiConnect Watch App */;
 			targetProxy = CA7E00000000000000000022 /* PBXContainerItemProxy */;
+		};
+		CA7E000000000000000000F4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA7E00000000000000000005 /* OpiConnectWidgets */;
+			targetProxy = CA7E00000000000000000023 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -689,6 +769,46 @@
 			};
 			name = Release;
 		};
+		CA7E00000000000000001050 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OpiConnectWidgets/OpiConnectWidgets.entitlements;
+				INFOPLIST_FILE = OpiConnectWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp.widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		CA7E00000000000000001051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OpiConnectWidgets/OpiConnectWidgets.entitlements;
+				INFOPLIST_FILE = OpiConnectWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp.widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -733,6 +853,15 @@
 			buildConfigurations = (
 				CA7E00000000000000001040 /* Debug */,
 				CA7E00000000000000001041 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA7E000000000000000000B5 /* Build configuration list for PBXNativeTarget "OpiConnectWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA7E00000000000000001050 /* Debug */,
+				CA7E00000000000000001051 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

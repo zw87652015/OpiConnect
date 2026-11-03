@@ -613,6 +613,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = OpiConnect;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -630,6 +631,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = OpiConnect;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect";
 				PRODUCT_NAME = "$(TARGET_NAME)";

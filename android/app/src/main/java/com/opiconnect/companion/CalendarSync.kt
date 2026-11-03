@@ -125,10 +125,36 @@ object CalendarSync {
                     )
                 }
             }
-        }.onFailure { Log.w(TAG, "calendar query failed: $it") }
+        }.onFailure {
+            Log.w(TAG, "calendar query failed: $it")
+            AppState.setCalendarFound("Query failed: ${it.javaClass.simpleName}: ${it.message}")
+        }
 
-        return CalendarPayload.build(events, from, to)
+        val msg = CalendarPayload.build(events, from, to)
+        val (total, visible) = calendarCounts(context)
+        val found = "Calendars: $total ($visible visible) · events in next 30 days: ${events.size}"
+        Log.i(TAG, "$found · json ${msg.evJson.length} chars")
+        if (events.isNotEmpty() || AppState.calendarFound.value?.startsWith("Query failed") != true) {
+            AppState.setCalendarFound(found)
+        }
+        return msg
     }
+
+    // (all calendars, visible calendars) as seen through CalendarContract.
+    private fun calendarCounts(context: Context): Pair<Int, Int> = runCatching {
+        var total = 0
+        var visible = 0
+        context.contentResolver.query(
+            CalendarContract.Calendars.CONTENT_URI,
+            arrayOf(CalendarContract.Calendars.VISIBLE), null, null, null,
+        )?.use { c ->
+            while (c.moveToNext()) {
+                total++
+                if (c.getInt(0) == 1) visible++
+            }
+        }
+        total to visible
+    }.getOrDefault(-1 to -1)
 
     private fun loadReminders(context: Context, eventId: Long): List<Int> = runCatching {
         val out = ArrayList<Int>()

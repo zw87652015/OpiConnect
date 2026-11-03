@@ -383,20 +383,33 @@ class LinkService : Service() {
     // Sends cal to every authenticated connection whose last-known hash differs.
     fun sendCal(msg: com.opiconnect.companion.core.CalMessage) {
         conns.values.forEach { conn ->
-            if (conn.authenticated && conn.lastCalHash != msg.h) {
-                if (send(conn, Messages.Cal(msg))) conn.lastCalHash = msg.h
-            }
+            if (conn.authenticated && conn.lastCalHash != msg.h) queueCal(conn, msg)
         }
     }
 
     private fun sendCalTo(conn: Conn) {
-        if (!CalendarSync.hasPermission(this)) return
+        if (!CalendarSync.hasPermission(this)) {
+            AppState.setCalendarSent("Not sent: calendar permission not granted")
+            return
+        }
         // Rebuild on every hello: the 30-day window moves even when no event changes.
         val msg = CalendarSync.build(this) ?: return
-        if (conn.lastCalHash != msg.h) {
-            if (send(conn, Messages.Cal(msg))) conn.lastCalHash = msg.h
-        }
+        if (conn.lastCalHash != msg.h) queueCal(conn, msg)
+        else AppState.setCalendarSent("Watch already up to date (${timeNow()})")
     }
+
+    private fun queueCal(conn: Conn, msg: com.opiconnect.companion.core.CalMessage) {
+        val ok = send(conn, Messages.Cal(msg))
+        if (ok) conn.lastCalHash = msg.h
+        val kb = (msg.evJson.length + 1023) / 1024
+        AppState.setCalendarSent(
+            if (ok) "Sent to watch: ~$kb KB (${timeNow()})"
+            else "Send failed: watch not subscribed (${timeNow()})",
+        )
+    }
+
+    private fun timeNow(): String =
+        java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
 
     // First connection with an active watch (per Router's delivery rule).
     fun activeWatch(): Conn? =

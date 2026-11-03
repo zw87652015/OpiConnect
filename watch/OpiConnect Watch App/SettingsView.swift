@@ -3,6 +3,13 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var model: AppModel
     @State private var confirmUnpair = false
+    @StateObject private var link = PhoneLink.shared
+
+    private var calendarText: String {
+        guard let cal = model.calendar else { return "never received" }
+        let ago = RelativeDateTimeFormatter().localizedString(for: cal.updatedAt, relativeTo: Date())
+        return "\(cal.events.count) events · \(ago)"
+    }
 
     private var relayURL: String {
         Bundle.main.object(forInfoDictionaryKey: "OpiRelayURL") as? String ?? "-"
@@ -18,6 +25,12 @@ struct SettingsView: View {
                 LabeledContent("Pair ID", value: String(PairingKeys.shared.pairId.prefix(8)))
                 LabeledContent("Relay", value: relayURL)
                 LabeledContent("Version", value: version)
+            }
+            Section("Diagnostics") {
+                LabeledContent("Link", value: link.status.rawValue)
+                LabeledContent("Calendar", value: calendarText)
+                LabeledContent("BLE received", value: "\(link.receivedMessages)")
+                LabeledContent("BLE dropped", value: "\(link.droppedMessages)")
             }
             Section {
                 Button("Unpair", role: .destructive) { confirmUnpair = true }

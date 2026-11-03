@@ -97,6 +97,8 @@ fun SetupScreen() {
     val watchLink by AppState.watchLink.collectAsState()
     val lastRelay by AppState.lastRelay.collectAsState()
     val lastError by AppState.lastError.collectAsState()
+    val calendarFound by AppState.calendarFound.collectAsState()
+    val calendarSent by AppState.calendarSent.collectAsState()
 
     fun refresh() {
         permissionsGranted = BLE_PERMISSIONS.all {
@@ -109,6 +111,12 @@ fun SetupScreen() {
         paired = PairingStore.isPaired(context)
         calendarGranted = CalendarSync.hasPermission(context)
         calendarApps = if (calendarGranted) CalendarApps.labels(context) else emptyList()
+        // Permission may have been granted after the service started: register the change
+        // observer now and push the calendar to a connected watch.
+        if (calendarGranted) {
+            CalendarSync.start(context)
+            CalendarSync.schedule()
+        }
         ringing = FindPhone.ringing.value
         // Recover the link service if it wasn't allowed to start in the background.
         if (paired && permissionsGranted) LinkService.start(context)
@@ -261,6 +269,12 @@ fun SetupScreen() {
                                 if (calendarApps.isNotEmpty()) " Detected: ${calendarApps.joinToString()}" else "",
                             style = MaterialTheme.typography.bodySmall,
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            calendarFound ?: "Calendar not read yet — open the watch app",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        calendarSent?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                     } else {
                         Text(
                             "Powers the watch calendar and on-wrist reminders.",

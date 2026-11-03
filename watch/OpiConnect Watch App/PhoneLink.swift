@@ -13,6 +13,9 @@ final class PhoneLink: NSObject, ObservableObject {
     }
 
     @Published private(set) var status: Status = .off
+    // Diagnostics (Settings): messages that failed to open/decode vs. handled, since launch.
+    @Published private(set) var droppedMessages = 0
+    @Published private(set) var receivedMessages = 0
 
     private static let serviceUUID = CBUUID(string: "6f70690a-0001-4c6f-9e2b-6f7069636f6e")
     private static let txUUID = CBUUID(string: "6f70690a-0002-4c6f-9e2b-6f7069636f6e")
@@ -329,7 +332,11 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
         guard error == nil, let data = characteristic.value else { return }
         guard let sealed = reassembler.push(data) else { return }
         guard let plaintext = try? OpiCrypto.open(sealed, using: PairingKeys.shared.encKey),
-              let message = BLEMessage.decode(plaintext) else { return }
+              let message = BLEMessage.decode(plaintext) else {
+            droppedMessages += 1
+            return
+        }
+        receivedMessages += 1
         lastInboundAt = Date()
         handle(message)
     }

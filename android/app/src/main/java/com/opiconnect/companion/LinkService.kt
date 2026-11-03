@@ -214,7 +214,9 @@ class LinkService : Service() {
             val service = BluetoothGattService(SERVICE_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
             tx = BluetoothGattCharacteristic(
                 TX_UUID,
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                // Indications: each chunk is confirmed by the watch before the next one goes
+                // out. Unacknowledged notifications got dropped on large (calendar) messages.
+                BluetoothGattCharacteristic.PROPERTY_INDICATE,
                 0,
             ).apply {
                 addDescriptor(
@@ -264,7 +266,8 @@ class LinkService : Service() {
                 if (responseNeeded) gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_FAILURE, 0, null)
                 return
             }
-            val enable = value?.contentEquals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == true
+            val enable = value?.contentEquals(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) == true ||
+                value?.contentEquals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == true
             val conn = conns[device.address]
             if (conn != null && value != null) {
                 conn.cccdEnabled = enable
@@ -284,7 +287,7 @@ class LinkService : Service() {
             device: BluetoothDevice, requestId: Int, offset: Int, descriptor: BluetoothGattDescriptor,
         ) {
             val value = if (conns[device.address]?.cccdEnabled == true)
-                BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
             else
                 BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
             gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, value)
@@ -422,7 +425,7 @@ class LinkService : Service() {
         conn: Conn, server: BluetoothGattServer,
         tx: BluetoothGattCharacteristic, chunk: ByteArray,
     ) {
-        val status = server.notifyCharacteristicChanged(conn.device, tx, false, chunk)
+        val status = server.notifyCharacteristicChanged(conn.device, tx, true, chunk)
         if (status != BluetoothStatusCodes.SUCCESS) {
             onChunkFailed(conn)
         }

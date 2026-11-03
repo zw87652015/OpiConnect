@@ -91,7 +91,10 @@ relay's hard limit on `c`).
 ## BLE link
 
 - GATT service UUID: `6f70690a-0001-4c6f-9e2b-6f7069636f6e`
-- `TX` characteristic (notify, phone → watch): `6f70690a-0002-4c6f-9e2b-6f7069636f6e`
+- `TX` characteristic (indicate, phone → watch): `6f70690a-0002-4c6f-9e2b-6f7069636f6e`.
+  Indications, not notifications: the watch confirms each chunk at the ATT layer and the phone
+  sends the next chunk only after `onNotificationSent`. With unacknowledged notifications, large
+  messages (`cal`, ~170 chunks) overran the watch and chunks were silently dropped.
 - `RX` characteristic (write with response, watch → phone): `6f70690a-0003-4c6f-9e2b-6f7069636f6e`
 
 Roles: the phone is the **GATT server + advertiser** (Android supports peripheral mode); the

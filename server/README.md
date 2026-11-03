@@ -43,6 +43,8 @@ instance on the same machine: same key, same domain, different path and port.
 1. **Confirm the Team ID**: Membership page → "Team ID" (10 characters). It must be the same
    team that issued the existing `.p8` key.
 2. **Register App IDs** (Certificates, Identifiers & Profiles → Identifiers → `+` → App IDs):
+   - `<prefix>.opiconnect` — the container app that gets uploaded; no capabilities needed. Its
+     bundle ID is the one you pick when creating the app record in App Store Connect.
    - `<prefix>.opiconnect.watchkitapp` — capabilities: **Push Notifications**, **App Groups**
    - `<prefix>.opiconnect.watchkitapp.NotificationService` — capability: **App Groups**
 3. **Register the App Group** (Identifiers → App Groups → `+`):
@@ -89,8 +91,10 @@ sudo chmod 600 /opt/opiconnect-push/AuthKey.p8
 PORT=8788
 HOST=127.0.0.1
 APNS_KEY_FILE=/opt/opiconnect-push/AuthKey.p8
-APNS_KEY_ID=XXXXXXXXXX          # Key ID from the Apple portal
-APNS_TEAM_ID=XXXXXXXXXX         # Team ID from the Membership page
+# Key ID from the Apple portal, Team ID from the Membership page.
+# systemd does not allow comments at the end of a value line.
+APNS_KEY_ID=XXXXXXXXXX
+APNS_TEAM_ID=XXXXXXXXXX
 APNS_TOPIC=<prefix>.opiconnect.watchkitapp
 APNS_ENV=production
 DATA_DIR=/opt/opiconnect-push/data

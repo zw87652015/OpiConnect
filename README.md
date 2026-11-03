@@ -76,6 +76,8 @@ automatically; TestFlight/App Store builds use production.
 
 **TestFlight/App Store:** select the **"OpiConnect"** scheme (the container), destination
 "Any iOS Device", then *Product > Archive* and *Distribute App > App Store Connect*.
+Or run `scripts/testflight.sh` (archive + upload; `DESTINATION=export` builds a local
+.ipa without uploading). TestFlight builds expire after 90 days, so re-run it before then.
 App Store Connect will ask about **export compliance**: the app uses AES-GCM for
 end-to-end encryption — answer the questionnaire for your situation (standard
 OS-provided crypto usually qualifies for an exemption, but the answer is your

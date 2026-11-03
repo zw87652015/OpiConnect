@@ -26,7 +26,7 @@
 	<true/>
 	<key>WKWatchOnly</key>
 	<true/>
-	<key>WKBackgroundModes</key>
+	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
 		<string>remote-notification</string>

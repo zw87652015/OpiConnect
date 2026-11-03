@@ -86,6 +86,7 @@ fun SetupScreen() {
 
     var permissionsGranted by remember { mutableStateOf(false) }
     var listenerEnabled by remember { mutableStateOf(false) }
+    var listenerBound by remember { mutableStateOf(false) }
     var batteryExempt by remember { mutableStateOf(false) }
     var calendarGranted by remember { mutableStateOf(false) }
     var calendarApps by remember { mutableStateOf(emptyList<String>()) }
@@ -106,6 +107,8 @@ fun SetupScreen() {
         }
         listenerEnabled = NotificationManagerCompat
             .getEnabledListenerPackages(context).contains(context.packageName)
+        if (listenerEnabled) OpiListenerService.ensureBound(context)
+        listenerBound = OpiListenerService.instance != null
         batteryExempt = context.getSystemService(PowerManager::class.java)
             ?.isIgnoringBatteryOptimizations(context.packageName) == true
         paired = PairingStore.isPaired(context)
@@ -177,7 +180,8 @@ fun SetupScreen() {
             StepCard(
                 title = "2. Notification access",
                 done = listenerEnabled,
-                doneText = "OpiConnect can read notifications",
+                doneText = if (listenerBound) "OpiConnect can read notifications"
+                    else "Access granted, but the listener isn't running — reopen OpiConnect",
                 actionText = "Open settings",
             ) {
                 context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))

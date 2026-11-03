@@ -21,7 +21,10 @@ final class PhoneLink: NSObject, ObservableObject {
     private var central: CBCentralManager!
     private var peripheral: CBPeripheral?
     private var rx: CBCharacteristic?
-    private var rejected = Set<CBPeripheralIdentifierBox>()
+    // Peripherals that failed auth/discovery, skipped for a short while so a phone that
+    // recovers (e.g. after a Bluetooth toggle) is retried instead of ignored all session.
+    private var rejected: [CBPeripheralIdentifierBox: Date] = [:]
+    private static let rejectFor: TimeInterval = 30
     private var appState = "active"
     private var running = false
     private var workItems: [DispatchWorkItem] = []
@@ -205,7 +208,7 @@ final class PhoneLink: NSObject, ObservableObject {
 
     private func dropPeripheral(reject: Bool) {
         guard let peripheral else { return }
-        if reject { rejected.insert(CBPeripheralIdentifierBox(peripheral.identifier)) }
+        if reject { rejected[CBPeripheralIdentifierBox(peripheral.identifier)] = Date() }
         central.cancelPeripheralConnection(peripheral)
         cleanupConnection()
         if running { beginScan() }
@@ -233,8 +236,9 @@ extension PhoneLink: @preconcurrency CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
                         advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        guard !rejected.contains(CBPeripheralIdentifierBox(peripheral.identifier)),
-              self.peripheral == nil else { return }
+        if let at = rejected[CBPeripheralIdentifierBox(peripheral.identifier)],
+           Date().timeIntervalSince(at) < Self.rejectFor { return }
+        guard self.peripheral == nil else { return }
         self.peripheral = peripheral
         status = .connecting
         central.stopScan()

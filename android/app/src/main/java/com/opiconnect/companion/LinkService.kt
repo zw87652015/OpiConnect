@@ -503,8 +503,13 @@ class LinkService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
                 BluetoothAdapter.STATE_ON -> openServerAndAdvertise()
-                BluetoothAdapter.STATE_OFF -> {
+                // The stack tears down the GATT server with the adapter; drop our handle so
+                // STATE_ON builds a fresh server instead of advertising a dead one.
+                BluetoothAdapter.STATE_TURNING_OFF, BluetoothAdapter.STATE_OFF -> {
                     stopAdvertising()
+                    runCatching { gattServer?.close() }
+                    gattServer = null
+                    tx = null
                     conns.clear()
                     updateAppState()
                 }

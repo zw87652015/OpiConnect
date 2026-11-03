@@ -83,16 +83,6 @@ object RelaySeal {
         Crypto.base64url(Crypto.seal(p.toJson().toByteArray(Charsets.UTF_8), encKey))
 }
 
-private fun String.takeCodePoints(n: Int): String {
-    var count = 0
-    var idx = 0
-    while (idx < length && count < n) {
-        idx += if (Character.isSupplementaryCodePoint(codePointAt(idx))) 2 else 1
-        count++
-    }
-    return substring(0, idx)
-}
-
 private fun String.dropLastCodePoint(): String {
     if (isEmpty()) return this
     val last = codePointBeforeLast(length)

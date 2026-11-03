@@ -90,8 +90,10 @@ final class PhoneLink: NSObject, ObservableObject {
         status == .authenticated && rx != nil
     }
 
+    // Live messages (hello, state, ack) go out as soon as the RX channel exists, since hello
+    // is what earns the welcome; the persisted queue waits for authentication.
     private func pumpWrites() {
-        guard canWrite, chunkQueue.isEmpty else { return }
+        guard rx != nil, chunkQueue.isEmpty else { return }
         // .withoutResponse returns ATT MTU - 3; .withResponse would return 512 and make
         // CoreBluetooth issue prepared writes, which our GATT server rejects.
         let maxLen = peripheral?.maximumWriteValueLength(for: .withoutResponse) ?? 182
@@ -99,7 +101,7 @@ final class PhoneLink: NSObject, ObservableObject {
             messageQueue.removeFirst()
             chunkQueue = Chunker.split(sealed, maxLen: max(2, maxLen))
             writingQueueMessage = false
-        } else if let plaintext = PendingQueue.shared.items.first,
+        } else if canWrite, let plaintext = PendingQueue.shared.items.first,
                   let sealed = try? OpiCrypto.seal(plaintext, using: PairingKeys.shared.encKey) {
             chunkQueue = Chunker.split(sealed, maxLen: max(2, maxLen))
             writingQueueMessage = true

@@ -1,0 +1,13 @@
+// Forks / contributors: put your own DEVELOPMENT_TEAM and BUNDLE_PREFIX in Local.xcconfig (git-ignored).
+// "//" starts a comment in xcconfig; write it as /$()/ when needed inside a value.
+
+BUNDLE_PREFIX = com.example
+DEVELOPMENT_TEAM =
+APP_GROUP = group.$(BUNDLE_PREFIX).opiconnect
+// Relay base URL of server/index.mjs, deployed behind Caddy as described in server/README.md.
+RELAY_URL = https:/$()/push.luojiajiang.uk/opi
+CODE_SIGN_STYLE = Automatic
+MARKETING_VERSION = 1.0
+CURRENT_PROJECT_VERSION = 1
+SWIFT_VERSION = 5.0
+#include? "Local.xcconfig"

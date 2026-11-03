@@ -1,0 +1,15 @@
+{
+  "originHash" : "5e757e10247804e3aa3edfa2caccb49ec32817e1e8daf4f040450bf2d8e95587",
+  "pins" : [
+    {
+      "identity" : "swift-qrcode-generator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/fwcd/swift-qrcode-generator",
+      "state" : {
+        "revision" : "2b1980b825f08a81ccc762b0c4d17fcde9d5e953",
+        "version" : "2.0.2"
+      }
+    }
+  ],
+  "version" : 3
+}

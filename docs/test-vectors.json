@@ -1,0 +1,34 @@
+{
+  "description": "OpiConnect crypto test vectors (docs/PROTOCOL.md). base64url = RFC 4648 url-safe, no padding. K = bytes 0x00..0x1f.",
+  "masterKeyHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "qr": "opi1:AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+  "pairId": "GO_nU3cNYuM99iwOYf3Vuw",
+  "secret": "JS32phtUy_TfYgMam97NY0_zIXHV1Uia4vSna2QDWKY",
+  "encKeyHex": "5e7588d47108805c82b460cdebfd56a848e6c2ec97ecba1fb8692fefa142b580",
+  "seal": [
+    {
+      "nonceHex": "000102030405060708090a0b",
+      "plaintext": "{\"i\":\"AbCdEfGhIjKlMnOpQrStUv\",\"p\":\"com.example.chat\",\"a\":\"示例应用\",\"t\":\"新消息\",\"b\":\"你好 👋 晚上一起吃饭吗？\",\"w\":1730000000000,\"x\":[{\"l\":\"回复\",\"r\":true},{\"l\":\"标为已读\",\"r\":false}]}",
+      "sealedBase64url": "AAECAwQFBgcICQoLOG5k6wyDXluVH9imYKy34l2n9cGck3d-XotxvZEHDApd7s-A9AiYzuMMBzLM7xQVR4WGsawaVguY7CQTN8KwwovMgCGz8AgzgNZXlw4z4GdQln8Yy3pXUNM0XF7be4qKSTFfDwSE62lQzcr7yY3hD4Ye9z39du5IlDG6Ij83ts7r-UuaWnUk9itF-G5DJ6UVQvlJ4O90wzbufE-BP4W-_fXQMZUhLvIF35CepnAjmqDelTzbs6OpO_QdK9LYRnObmKp6-6fwkq8dZKfX8ERh7vDJxzhxgRAVNuMBpVaJxrEBtg"
+    },
+    {
+      "nonceHex": "a0a1a2a3a4a5a6a7a8a9aaab",
+      "plaintext": "{\"type\":\"hello\",\"state\":\"active\"}",
+      "sealedBase64url": "oKGio6SlpqeoqaqrjsrJYi1PwFER8ULjD--twYZGoYkBz5-MStxskm19Yt3kHqC6qiUNdVawNqI1AYo7Fg"
+    }
+  ],
+  "notificationId": {
+    "sbnKey": "0|com.whatsapp|1|null|10123",
+    "id": "NkYDkEdeeTyangbdXi1CH6"
+  },
+  "chunking": {
+    "maxLen": 20,
+    "source": "seal[1]",
+    "chunksHex": [
+      "01a0a1a2a3a4a5a6a7a8a9aaab8ecac9622d4fc0",
+      "015111f142e30fefadc18646a18901cf9f8c4adc",
+      "016c926d7d62dde41ea0baaa250d7556b036a235",
+      "00018a3b16"
+    ]
+  }
+}

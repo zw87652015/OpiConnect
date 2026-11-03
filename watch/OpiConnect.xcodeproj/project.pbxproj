@@ -1,0 +1,764 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CA7E00000000000000000011 /* NotificationService.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CA7E00000000000000000040 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CA7E00000000000000000012 /* OpiConnect Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = CA7E00000000000000000030 /* OpiConnect Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CA7E00000000000000000013 /* QRCodeGenerator in Frameworks */ = {isa = PBXBuildFile; productRef = CA7E00000000000000000014 /* QRCodeGenerator */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CA7E00000000000000000020 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA7E00000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA7E00000000000000000002;
+			remoteInfo = "OpiConnect Watch App";
+		};
+		CA7E00000000000000000021 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA7E00000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA7E00000000000000000003;
+			remoteInfo = NotificationService;
+		};
+		CA7E00000000000000000022 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA7E00000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA7E00000000000000000002;
+			remoteInfo = "OpiConnect Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CA7E00000000000000000090 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				CA7E00000000000000000012 /* OpiConnect Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E00000000000000000091 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				CA7E00000000000000000011 /* NotificationService.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		CA7E00000000000000000030 /* OpiConnect Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpiConnect Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA7E00000000000000000031 /* OpiConnect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpiConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA7E00000000000000000040 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA7E00000000000000000050 /* OpiConnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpiConnectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA7E00000000000000000060 /* OpiConnect.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = OpiConnect.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CA7E00000000000000000071 /* Exceptions for "OpiConnect Watch App" folder in "OpiConnect Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				OpiConnect.entitlements,
+			);
+			target = CA7E00000000000000000002 /* OpiConnect Watch App */;
+		};
+		CA7E00000000000000000072 /* Exceptions for "NotificationService" folder in "NotificationService" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				NotificationService.entitlements,
+			);
+			target = CA7E00000000000000000003 /* NotificationService */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CA7E00000000000000000080 /* OpiConnect */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OpiConnect;
+			sourceTree = "<group>";
+		};
+		CA7E00000000000000000081 /* OpiConnect Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CA7E00000000000000000071 /* Exceptions for "OpiConnect Watch App" folder in "OpiConnect Watch App" target */,
+			);
+			path = "OpiConnect Watch App";
+			sourceTree = "<group>";
+		};
+		CA7E00000000000000000082 /* NotificationService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CA7E00000000000000000072 /* Exceptions for "NotificationService" folder in "NotificationService" target */,
+			);
+			path = NotificationService;
+			sourceTree = "<group>";
+		};
+		CA7E00000000000000000083 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		CA7E00000000000000000084 /* OpiConnectTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OpiConnectTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CA7E000000000000000000A0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000A1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7E00000000000000000013 /* QRCodeGenerator in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000A3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CA7E000000000000000000E0 = {
+			isa = PBXGroup;
+			children = (
+				CA7E00000000000000000060 /* OpiConnect.xcconfig */,
+				CA7E00000000000000000080 /* OpiConnect */,
+				CA7E00000000000000000081 /* OpiConnect Watch App */,
+				CA7E00000000000000000082 /* NotificationService */,
+				CA7E00000000000000000083 /* Shared */,
+				CA7E00000000000000000084 /* OpiConnectTests */,
+				CA7E000000000000000000E1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CA7E000000000000000000E1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CA7E00000000000000000031 /* OpiConnect.app */,
+				CA7E00000000000000000030 /* OpiConnect Watch App.app */,
+				CA7E00000000000000000040 /* NotificationService.appex */,
+				CA7E00000000000000000050 /* OpiConnectTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CA7E00000000000000000001 /* OpiConnect */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA7E000000000000000000B1 /* Build configuration list for PBXNativeTarget "OpiConnect" */;
+			buildPhases = (
+				CA7E000000000000000000C1 /* Sources */,
+				CA7E000000000000000000A0 /* Frameworks */,
+				CA7E000000000000000000D1 /* Resources */,
+				CA7E00000000000000000090 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA7E000000000000000000F1 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CA7E00000000000000000080 /* OpiConnect */,
+			);
+			name = OpiConnect;
+			packageProductDependencies = (
+			);
+			productName = OpiConnect;
+			productReference = CA7E00000000000000000031 /* OpiConnect.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		CA7E00000000000000000002 /* OpiConnect Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA7E000000000000000000B2 /* Build configuration list for PBXNativeTarget "OpiConnect Watch App" */;
+			buildPhases = (
+				CA7E000000000000000000C2 /* Sources */,
+				CA7E000000000000000000A1 /* Frameworks */,
+				CA7E000000000000000000D2 /* Resources */,
+				CA7E00000000000000000091 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA7E000000000000000000F2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CA7E00000000000000000081 /* OpiConnect Watch App */,
+				CA7E00000000000000000083 /* Shared */,
+			);
+			name = "OpiConnect Watch App";
+			packageProductDependencies = (
+				CA7E00000000000000000014 /* QRCodeGenerator */,
+			);
+			productName = "OpiConnect Watch App";
+			productReference = CA7E00000000000000000030 /* OpiConnect Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CA7E00000000000000000003 /* NotificationService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA7E000000000000000000B3 /* Build configuration list for PBXNativeTarget "NotificationService" */;
+			buildPhases = (
+				CA7E000000000000000000C3 /* Sources */,
+				CA7E000000000000000000A2 /* Frameworks */,
+				CA7E000000000000000000D3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CA7E00000000000000000082 /* NotificationService */,
+				CA7E00000000000000000083 /* Shared */,
+			);
+			name = NotificationService;
+			packageProductDependencies = (
+			);
+			productName = NotificationService;
+			productReference = CA7E00000000000000000040 /* NotificationService.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		CA7E00000000000000000004 /* OpiConnectTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA7E000000000000000000B4 /* Build configuration list for PBXNativeTarget "OpiConnectTests" */;
+			buildPhases = (
+				CA7E000000000000000000C4 /* Sources */,
+				CA7E000000000000000000A3 /* Frameworks */,
+				CA7E000000000000000000D4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA7E000000000000000000F3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CA7E00000000000000000084 /* OpiConnectTests */,
+			);
+			name = OpiConnectTests;
+			packageProductDependencies = (
+			);
+			productName = OpiConnectTests;
+			productReference = CA7E00000000000000000050 /* OpiConnectTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CA7E00000000000000000000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2710;
+				LastUpgradeCheck = 2710;
+				TargetAttributes = {
+					CA7E00000000000000000001 = {
+						CreatedOnToolsVersion = 27.1;
+					};
+					CA7E00000000000000000002 = {
+						CreatedOnToolsVersion = 27.1;
+					};
+					CA7E00000000000000000003 = {
+						CreatedOnToolsVersion = 27.1;
+					};
+					CA7E00000000000000000004 = {
+						CreatedOnToolsVersion = 27.1;
+						TestTargetID = CA7E00000000000000000002;
+					};
+				};
+			};
+			buildConfigurationList = CA7E000000000000000000B0 /* Build configuration list for PBXProject "OpiConnect" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CA7E000000000000000000E0;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CA7E000000000000000000F0 /* XCRemoteSwiftPackageReference "swift-qrcode-generator" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CA7E000000000000000000E1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CA7E00000000000000000001 /* OpiConnect */,
+				CA7E00000000000000000002 /* OpiConnect Watch App */,
+				CA7E00000000000000000003 /* NotificationService */,
+				CA7E00000000000000000004 /* OpiConnectTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CA7E000000000000000000D1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000D3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000D4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CA7E000000000000000000C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E000000000000000000C4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CA7E000000000000000000F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA7E00000000000000000002 /* OpiConnect Watch App */;
+			targetProxy = CA7E00000000000000000020 /* PBXContainerItemProxy */;
+		};
+		CA7E000000000000000000F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA7E00000000000000000003 /* NotificationService */;
+			targetProxy = CA7E00000000000000000021 /* PBXContainerItemProxy */;
+		};
+		CA7E000000000000000000F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "OpiConnect Watch App";
+			target = CA7E00000000000000000002 /* OpiConnect Watch App */;
+			targetProxy = CA7E00000000000000000022 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CA7E00000000000000001000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CA7E00000000000000001001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CA7E00000000000000001010 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OpiConnect;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CA7E00000000000000001011 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OpiConnect;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CA7E00000000000000001020 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "OpiConnect Watch App/OpiConnect.entitlements";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "OpiConnect Watch App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		CA7E00000000000000001021 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "OpiConnect Watch App/OpiConnect.entitlements";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "OpiConnect Watch App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		CA7E00000000000000001030 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
+				INFOPLIST_FILE = NotificationService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp.NotificationService";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		CA7E00000000000000001031 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
+				INFOPLIST_FILE = NotificationService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp.NotificationService";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		CA7E00000000000000001040 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpiConnect Watch App.app/OpiConnect Watch App";
+				TEST_TARGET_NAME = "OpiConnect Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		CA7E00000000000000001041 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA7E00000000000000000060 /* OpiConnect.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_PREFIX).opiconnect.watchkitapp.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpiConnect Watch App.app/OpiConnect Watch App";
+				TEST_TARGET_NAME = "OpiConnect Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CA7E000000000000000000B0 /* Build configuration list for PBXProject "OpiConnect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA7E00000000000000001000 /* Debug */,
+				CA7E00000000000000001001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA7E000000000000000000B1 /* Build configuration list for PBXNativeTarget "OpiConnect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA7E00000000000000001010 /* Debug */,
+				CA7E00000000000000001011 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA7E000000000000000000B2 /* Build configuration list for PBXNativeTarget "OpiConnect Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA7E00000000000000001020 /* Debug */,
+				CA7E00000000000000001021 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA7E000000000000000000B3 /* Build configuration list for PBXNativeTarget "NotificationService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA7E00000000000000001030 /* Debug */,
+				CA7E00000000000000001031 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA7E000000000000000000B4 /* Build configuration list for PBXNativeTarget "OpiConnectTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA7E00000000000000001040 /* Debug */,
+				CA7E00000000000000001041 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CA7E000000000000000000F0 /* XCRemoteSwiftPackageReference "swift-qrcode-generator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fwcd/swift-qrcode-generator";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CA7E00000000000000000014 /* QRCodeGenerator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA7E000000000000000000F0 /* XCRemoteSwiftPackageReference "swift-qrcode-generator" */;
+			productName = QRCodeGenerator;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = CA7E00000000000000000000 /* Project object */;
+}

@@ -68,7 +68,7 @@ class LinkService : Service() {
                 // ForegroundServiceStartNotAllowedException (background start) or
                 // IllegalStateException — the listener must never crash here.
                 Log.w(TAG, "couldn't start service: $e")
-                AppState.setError("Couldn't start background service — open OpiLink")
+                AppState.setError(context.getString(R.string.error_bg_service))
             }
         }
 
@@ -118,7 +118,7 @@ class LinkService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!hasBlePermissions()) {
-            AppState.setError("Bluetooth permissions not granted")
+            AppState.setError(getString(R.string.error_bt_permissions))
             stopSelf()
             return START_NOT_STICKY
         }
@@ -167,7 +167,7 @@ class LinkService : Service() {
         )
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setContentTitle("OpiLink is running")
+            .setContentTitle(getString(R.string.fg_notif_title))
             .setContentText(linkStatusText())
             .setContentIntent(pi)
             .setOngoing(true)
@@ -181,7 +181,7 @@ class LinkService : Service() {
     private fun updateNotification() {
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setContentTitle("OpiLink is running")
+            .setContentTitle(getString(R.string.fg_notif_title))
             .setContentText(linkStatusText())
             .setOngoing(true)
             .build()
@@ -189,10 +189,11 @@ class LinkService : Service() {
     }
 
     private fun linkStatusText(): String = when {
-        conns.values.any { it.authenticated && it.watchState == "active" } -> "Watch connected"
-        conns.values.any { it.authenticated } -> "Watch connected in background"
-        conns.isNotEmpty() -> "Watch connecting…"
-        else -> "Waiting for watch"
+        conns.values.any { it.authenticated && it.watchState == "active" } ->
+            getString(R.string.watch_connected)
+        conns.values.any { it.authenticated } -> getString(R.string.watch_connected_bg)
+        conns.isNotEmpty() -> getString(R.string.watch_connecting)
+        else -> getString(R.string.waiting_for_watch)
     }
 
     private fun updateAppState() {
@@ -255,9 +256,9 @@ class LinkService : Service() {
                 conns.remove(device.address)?.let { conn ->
                     val head = conn.messages.peek()
                     if (conn.messages.any { it.isCal }) {
-                        val at = if (head?.isCal == true) " at ${conn.chunkIndex}/${head.chunks.size}" else ""
+                        val at = if (head?.isCal == true) " ${conn.chunkIndex}/${head.chunks.size}" else ""
                         AppState.setCalendarSent(
-                            "Interrupted$at: watch disconnected — keep the watch app open (${timeNow()})",
+                            getString(R.string.cal_interrupted, at, timeNow()),
                         )
                     }
                 }
@@ -403,7 +404,7 @@ class LinkService : Service() {
     fun resendCal() {
         val targets = conns.values.filter { it.authenticated }
         if (targets.isEmpty()) {
-            AppState.setCalendarSent("Not sent: watch not connected — open OpiLink on the watch")
+            AppState.setCalendarSent(getString(R.string.cal_not_sent_watch))
             return
         }
         targets.forEach { sendCalTo(it, force = true) }
@@ -411,13 +412,13 @@ class LinkService : Service() {
 
     private fun sendCalTo(conn: Conn, force: Boolean = false) {
         if (!CalendarSync.hasPermission(this)) {
-            AppState.setCalendarSent("Not sent: calendar permission not granted")
+            AppState.setCalendarSent(getString(R.string.cal_not_sent_perm))
             return
         }
         // Rebuild on every hello: the 30-day window moves even when no event changes.
         val msg = CalendarSync.build(this) ?: return
         if (force || conn.lastCalHash != msg.h) queueCal(conn, msg)
-        else AppState.setCalendarSent("Watch already up to date (${timeNow()})")
+        else AppState.setCalendarSent(getString(R.string.cal_up_to_date, timeNow()))
     }
 
     private fun queueCal(conn: Conn, msg: com.opiconnect.companion.core.CalMessage) {
@@ -426,8 +427,8 @@ class LinkService : Service() {
         if (ok) conn.lastCalHash = msg.h
         val chunks = conn.messages.lastOrNull { it.isCal }?.chunks?.size ?: 0
         AppState.setCalendarSent(
-            if (ok) "Sending to watch: ~$kb KB in $chunks pieces (MTU ${conn.mtu})…"
-            else "Send failed: watch not subscribed (${timeNow()})",
+            if (ok) getString(R.string.cal_sending, kb, chunks, conn.mtu)
+            else getString(R.string.cal_send_failed, timeNow()),
         )
     }
 
@@ -449,7 +450,9 @@ class LinkService : Service() {
         val chunks = out.chunks
         if (conn.chunkIndex >= chunks.size) {
             conn.messages.poll()
-            if (out.isCal) AppState.setCalendarSent("Delivered to watch: ${chunks.size} pieces (${timeNow()})")
+            if (out.isCal) {
+                AppState.setCalendarSent(getString(R.string.cal_delivered, chunks.size, timeNow()))
+            }
             conn.chunkIndex = 0
             conn.retries = 0
             return pump(conn)
@@ -478,7 +481,9 @@ class LinkService : Service() {
             synchronized(conn) {
                 midMessage = conn.chunkIndex > 0
                 conn.messages.poll()?.takeIf { it.isCal }?.let {
-                    AppState.setCalendarSent("Failed at piece ${conn.chunkIndex}/${it.chunks.size} (${timeNow()})")
+                    AppState.setCalendarSent(
+                        getString(R.string.cal_failed_piece, conn.chunkIndex, it.chunks.size, timeNow()),
+                    )
                 }
                 conn.chunkIndex = 0
                 conn.retries = 0

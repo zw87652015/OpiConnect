@@ -38,6 +38,7 @@
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.OpiConnect"
+        android:localeConfig="@xml/locales_config"
         android:allowBackup="false">
 
         <activity

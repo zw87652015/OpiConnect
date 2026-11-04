@@ -28,6 +28,7 @@ object CalendarSync {
     private var observer: ContentObserver? = null
     var lastBuilt: CalMessage? = null
         private set
+    private var queryFailed = false
 
     fun hasPermission(context: Context): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR) ==
@@ -99,6 +100,7 @@ object CalendarSync {
             "${CalendarContract.Instances.SELF_ATTENDEE_STATUS} != ?)"
         val events = ArrayList<CalEvent>()
         val remindersCache = HashMap<Long, List<Int>>()
+        queryFailed = false
 
         runCatching {
             context.contentResolver.query(
@@ -127,14 +129,17 @@ object CalendarSync {
             }
         }.onFailure {
             Log.w(TAG, "calendar query failed: $it")
-            AppState.setCalendarFound("Query failed: ${it.javaClass.simpleName}: ${it.message}")
+            queryFailed = true
+            AppState.setCalendarFound(
+                context.getString(R.string.cal_query_failed, it.javaClass.simpleName, it.message),
+            )
         }
 
         val msg = CalendarPayload.build(events, from, to)
         val (total, visible) = calendarCounts(context)
-        val found = "Calendars: $total ($visible visible) · events in next 30 days: ${events.size}"
+        val found = context.getString(R.string.cal_found, total, visible, events.size)
         Log.i(TAG, "$found · json ${msg.evJson.length} chars")
-        if (events.isNotEmpty() || AppState.calendarFound.value?.startsWith("Query failed") != true) {
+        if (events.isNotEmpty() || !queryFailed) {
             AppState.setCalendarFound(found)
         }
         return msg

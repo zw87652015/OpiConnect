@@ -12,6 +12,7 @@ import com.opiconnect.companion.core.Crypto
 import com.opiconnect.companion.core.Messages
 import com.opiconnect.companion.core.NotifPayload
 import com.opiconnect.companion.core.RelaySeal
+import com.opiconnect.companion.core.cardPayload
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,20 +57,7 @@ object Router {
             return
         }
         forwarded.remove(id)
-        scope.launch {
-            val link = LinkService.instance
-            val sentBle = link != null && link.anyAuthenticated() && link.sendAll(Messages.Remove(id))
-            if (!sentBle) {
-                val keys = keys() ?: return@launch
-                val o = JSONObject().put("i", id)
-                val snap = PhoneStatus.current()
-                if (snap.bt >= 0) o.put("bt", snap.bt).put("bc", snap.bc)
-                val sealed = Crypto.base64url(
-                    Crypto.seal(o.toString().toByteArray(Charsets.UTF_8), keys.encKey),
-                )
-                RelayClient.push(keys, "remove", id, sealed)
-            }
-        }
+        sendRemove(id)
     }
 
     // Called by LinkService when the watch acks a notification id.
@@ -86,7 +74,7 @@ object Router {
         val service = OpiListenerService.instance ?: return emptyList()
         return service.activeNotifications
             .filter { passesFilter(it) }
-            .map { Crypto.notifId(it.key) }
+            .map { Crypto.notifId(it.key) } + CardStore.onWatchIds(service)
     }
 
     // Synthetic notification routed through the normal delivery path (test button).
@@ -103,7 +91,46 @@ object Router {
         deliver(payload)
     }
 
+    // Sends a DIY card through the normal delivery path and marks it on the watch.
+    fun sendCard(context: Context, card: OpiCard) {
+        val snap = PhoneStatus.current()
+        deliver(
+            cardPayload(
+                id = card.id,
+                label = card.label.ifEmpty { "OpiLink" },
+                code = card.code,
+                note = card.note,
+                bt = snap.bt.takeIf { it >= 0 },
+                bc = snap.bc,
+            ),
+        )
+        CardStore.setOnWatch(context, card.id, true)
+    }
+
+    // Removes a card from the watch and marks it off-watch in the library.
+    fun removeCard(context: Context, id: String) {
+        sendRemove(id)
+        CardStore.setOnWatch(context, id, false)
+    }
+
     // MARK: internals
+
+    private fun sendRemove(id: String) {
+        scope.launch {
+            val link = LinkService.instance
+            val sentBle = link != null && link.anyAuthenticated() && link.sendAll(Messages.Remove(id))
+            if (!sentBle) {
+                val keys = keys() ?: return@launch
+                val o = JSONObject().put("i", id)
+                val snap = PhoneStatus.current()
+                if (snap.bt >= 0) o.put("bt", snap.bt).put("bc", snap.bc)
+                val sealed = Crypto.base64url(
+                    Crypto.seal(o.toString().toByteArray(Charsets.UTF_8), keys.encKey),
+                )
+                RelayClient.push(keys, "remove", id, sealed)
+            }
+        }
+    }
 
     private fun deliver(payload: NotifPayload) {
         scope.launch {

@@ -37,19 +37,19 @@ object RelayClient {
                 client.newCall(request).execute().use { resp ->
                     when (resp.code) {
                         200 -> {
-                            AppState.setRelay("Sent via relay")
+                            AppState.setRelay(string(R.string.relay_sent))
                             return
                         }
-                        404 -> AppState.setRelay("Watch not registered yet — open OpiLink on the watch")
-                        401 -> AppState.setRelay("Relay rejected credentials — re-pair")
-                        410 -> AppState.setRelay("Watch push token expired — open the watch app")
-                        429 -> AppState.setRelay("Relay rate-limited, will retry later")
+                        404 -> AppState.setRelay(string(R.string.relay_not_registered))
+                        401 -> AppState.setRelay(string(R.string.relay_rejected))
+                        410 -> AppState.setRelay(string(R.string.relay_expired))
+                        429 -> AppState.setRelay(string(R.string.relay_rate_limited))
                         else -> {
                             if (resp.code >= 500 && attempt == 0) {
                                 delay(5000)
                                 return@use
                             }
-                            AppState.setRelay("Relay error ${resp.code}")
+                            AppState.setRelay(string(R.string.relay_error, resp.code))
                             return
                         }
                     }
@@ -59,10 +59,14 @@ object RelayClient {
                 if (attempt == 0) {
                     delay(5000)
                 } else {
-                    AppState.setRelay("No connection to relay")
+                    AppState.setRelay(string(R.string.relay_no_connection))
                     return
                 }
             }
         }
     }
+
+    private fun string(id: Int, vararg args: Any): String =
+        (OpiListenerService.instance ?: LinkService.instance)
+            ?.getString(id, *args).orEmpty()
 }

@@ -54,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -106,6 +107,11 @@ fun SetupScreen() {
     var paired by remember { mutableStateOf(PairingStore.isPaired(context)) }
     var showOppoTips by remember { mutableStateOf(false) }
     var confirmUnpair by remember { mutableStateOf(false) }
+    var cards by remember { mutableStateOf(CardStore.all(context)) }
+    var editingCard by remember { mutableStateOf<OpiCard?>(null) }
+    var showCardEditor by remember { mutableStateOf(false) }
+    var language by remember { mutableStateOf(AppLanguage.current(context)) }
+    var showLanguagePicker by remember { mutableStateOf(false) }
 
     val watchLink by AppState.watchLink.collectAsState()
     val lastRelay by AppState.lastRelay.collectAsState()
@@ -133,6 +139,7 @@ fun SetupScreen() {
             CalendarSync.schedule()
         }
         ringing = FindPhone.ringing.value
+        cards = CardStore.all(context)
         // Recover the link service if it wasn't allowed to start in the background.
         if (paired && permissionsGranted) LinkService.start(context)
     }
@@ -180,30 +187,40 @@ fun SetupScreen() {
         ) {
             Text("OpiLink", style = MaterialTheme.typography.headlineMedium)
 
+            TextButton(onClick = { showLanguagePicker = true }) {
+                Text(
+                    stringResource(R.string.language) + ": " +
+                        AppLanguage.options.firstOrNull { it.tag == language }
+                            ?.let { stringResource(it.nameRes) } ?: language,
+                )
+            }
+
             StepCard(
-                title = "1. Permissions",
+                title = stringResource(R.string.step_permissions),
                 done = permissionsGranted,
-                doneText = "Bluetooth + notifications granted",
-                actionText = "Grant permissions",
+                doneText = stringResource(R.string.permissions_done),
+                actionText = stringResource(R.string.grant_permissions),
             ) {
                 permissionLauncher.launch(BLE_PERMISSIONS)
             }
 
             StepCard(
-                title = "2. Notification access",
+                title = stringResource(R.string.step_notif_access),
                 done = listenerEnabled,
-                doneText = if (listenerBound) "OpiLink can read notifications"
-                    else "Access granted, but the listener isn't running — reopen OpiLink",
-                actionText = "Open settings",
+                doneText = stringResource(
+                    if (listenerBound) R.string.notif_access_ok
+                    else R.string.notif_access_not_running,
+                ),
+                actionText = stringResource(R.string.open_settings),
             ) {
                 context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
             }
 
             StepCard(
-                title = "3. Battery exemption",
+                title = stringResource(R.string.step_battery),
                 done = batteryExempt,
-                doneText = "Unrestricted background activity",
-                actionText = "Allow background",
+                doneText = stringResource(R.string.battery_done),
+                actionText = stringResource(R.string.allow_background),
             ) {
                 context.startActivity(
                     Intent(
@@ -215,13 +232,14 @@ fun SetupScreen() {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     TextButton(onClick = { showOppoTips = !showOppoTips }) {
-                        Text(if (showOppoTips) "OPPO / ColorOS tips ▲" else "OPPO / ColorOS tips ▼")
+                        Text(
+                            stringResource(R.string.oppo_tips) +
+                                if (showOppoTips) " ▲" else " ▼",
+                        )
                     }
                     if (showOppoTips) {
                         Text(
-                            "Settings > Battery > App battery management > OpiLink > " +
-                                "allow background activity and auto launch. Also lock OpiLink " +
-                                "in Recents so ColorOS doesn't kill it.",
+                            stringResource(R.string.oppo_tips_body),
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
@@ -231,19 +249,22 @@ fun SetupScreen() {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("4. Pairing", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.step_pairing), fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
                         Text(if (paired) "✓" else "…")
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     if (paired) {
                         Text(
-                            "Pair ID: ${PairingStore.keys(context)?.pairId?.take(8) ?: ""}…",
+                            stringResource(
+                                R.string.pair_id,
+                                PairingStore.keys(context)?.pairId?.take(8) ?: "",
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedButton(onClick = { confirmUnpair = true }) {
-                            Text("Unpair")
+                            Text(stringResource(R.string.unpair))
                         }
                     } else {
                         Button(onClick = {
@@ -259,12 +280,14 @@ fun SetupScreen() {
                                         LinkService.start(context)
                                     } else {
                                         scope.launch {
-                                            snackbar.showSnackbar("Not an OpiLink QR code")
+                                            snackbar.showSnackbar(
+                                                context.getString(R.string.not_opi_qr),
+                                            )
                                         }
                                     }
                                 }
                         }) {
-                            Text("Scan watch QR")
+                            Text(stringResource(R.string.scan_watch_qr))
                         }
                     }
                 }
@@ -278,10 +301,10 @@ fun SetupScreen() {
                     var mode by remember { mutableStateOf(ForwardPrefs.mode(context)) }
                     var selectedApps by remember { mutableStateOf(ForwardPrefs.apps(context)) }
                     var showPicker by remember { mutableStateOf(false) }
-                    Text("5. Forwarding", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.step_forwarding), fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Only when screen is off")
+                        Text(stringResource(R.string.screen_off_only))
                         Spacer(modifier = Modifier.weight(1f))
                         Switch(
                             checked = screenOffOnly,
@@ -292,16 +315,16 @@ fun SetupScreen() {
                         )
                     }
                     Text(
-                        "Skip notifications while you're using the phone.",
+                        stringResource(R.string.screen_off_desc),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Apps")
+                    Text(stringResource(R.string.apps))
                     listOf(
-                        ForwardPrefs.Mode.ALL to "All apps",
-                        ForwardPrefs.Mode.ALLOW to "Only selected apps",
-                        ForwardPrefs.Mode.BLOCK to "All except selected apps",
-                    ).forEach { (m, label) ->
+                        ForwardPrefs.Mode.ALL to R.string.fwd_all,
+                        ForwardPrefs.Mode.ALLOW to R.string.fwd_allow,
+                        ForwardPrefs.Mode.BLOCK to R.string.fwd_block,
+                    ).forEach { (m, labelRes) ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -316,13 +339,15 @@ fun SetupScreen() {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(selected = mode == m, onClick = null)
-                            Text(label)
+                            Text(stringResource(labelRes))
                         }
                     }
                     if (mode != ForwardPrefs.Mode.ALL) {
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedButton(onClick = { showPicker = true }) {
-                            Text("Choose apps (${selectedApps.size} selected)")
+                            Text(
+                                stringResource(R.string.choose_apps_selected, selectedApps.size),
+                            )
                         }
                     }
                     if (showPicker) {
@@ -337,42 +362,48 @@ fun SetupScreen() {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("6. Calendar (optional)", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.step_calendar), fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
                         Text(if (calendarGranted) "✓" else "")
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     if (calendarGranted) {
                         Text(
-                            "Watch shows the next 30 days and reminds you. " +
-                                "Calendar app notifications aren't forwarded — the watch reminds you itself." +
-                                if (calendarApps.isNotEmpty()) " Detected: ${calendarApps.joinToString()}" else "",
+                            stringResource(R.string.calendar_desc) +
+                                if (calendarApps.isNotEmpty()) {
+                                    " " + stringResource(
+                                        R.string.calendar_detected,
+                                        calendarApps.joinToString(),
+                                    )
+                                } else "",
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            calendarFound ?: "Calendar not read yet — open the watch app",
+                            calendarFound ?: stringResource(R.string.calendar_not_read),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         calendarSent?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedButton(onClick = {
                             val link = LinkService.instance
-                            if (link == null) AppState.setCalendarSent("Not sent: background service not running")
+                            if (link == null) AppState.setCalendarSent(
+                                context.getString(R.string.cal_not_sent_service),
+                            )
                             else Thread { link.resendCal() }.start()
                         }) {
-                            Text("Sync calendar to watch now")
+                            Text(stringResource(R.string.calendar_sync_now))
                         }
                     } else {
                         Text(
-                            "Powers the watch calendar and on-wrist reminders.",
+                            stringResource(R.string.calendar_denied_desc),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedButton(onClick = {
                             calendarLauncher.launch(Manifest.permission.READ_CALENDAR)
                         }) {
-                            Text("Grant calendar access")
+                            Text(stringResource(R.string.grant_calendar))
                         }
                     }
                 }
@@ -380,26 +411,82 @@ fun SetupScreen() {
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("7. Status", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.step_cards), fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Watch link: " + when (watchLink) {
-                            AppState.WatchLink.NONE -> "not connected"
-                            AppState.WatchLink.CONNECTED -> "connecting…"
-                            AppState.WatchLink.ACTIVE -> "active"
-                            AppState.WatchLink.BACKGROUND -> "background"
-                        },
+                        stringResource(R.string.cards_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    cards.forEach { card ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                if (card.label.isNotEmpty()) {
+                                    Text(card.label, style = MaterialTheme.typography.bodySmall)
+                                }
+                                Text(card.code, fontWeight = FontWeight.Bold)
+                                if (card.onWatch) {
+                                    Text(
+                                        stringResource(R.string.on_watch),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
+                            TextButton(
+                                onClick = {
+                                    Router.sendCard(context, card)
+                                    cards = CardStore.all(context)
+                                },
+                                enabled = paired,
+                            ) { Text(stringResource(R.string.send)) }
+                            TextButton(onClick = {
+                                editingCard = card
+                                showCardEditor = true
+                            }) { Text(stringResource(R.string.edit)) }
+                            TextButton(onClick = {
+                                if (card.onWatch) Router.removeCard(context, card.id)
+                                CardStore.delete(context, card.id)
+                                cards = CardStore.all(context)
+                            }) { Text(stringResource(R.string.delete)) }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(onClick = {
+                        editingCard = null
+                        showCardEditor = true
+                    }) {
+                        Text(stringResource(R.string.new_card))
+                    }
+                }
+            }
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.step_status), fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        stringResource(
+                            R.string.watch_link,
+                            when (watchLink) {
+                                AppState.WatchLink.NONE -> stringResource(R.string.watch_link_none)
+                                AppState.WatchLink.CONNECTED ->
+                                    stringResource(R.string.watch_link_connecting)
+                                AppState.WatchLink.ACTIVE -> stringResource(R.string.watch_link_active)
+                                AppState.WatchLink.BACKGROUND ->
+                                    stringResource(R.string.watch_link_background)
+                            },
+                        ),
                     )
                     lastRelay?.let {
                         Text(
-                            "Relay: ${it.text}",
+                            stringResource(R.string.relay_line, it.text),
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
                     if (ringing) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { FindPhone.stop(context) }) {
-                            Text("Stop ringing")
+                            Text(stringResource(R.string.stop_ringing))
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -407,14 +494,14 @@ fun SetupScreen() {
                         onClick = { Router.test() },
                         enabled = paired,
                     ) {
-                        Text("Send test notification")
+                        Text(stringResource(R.string.send_test))
                     }
                 }
             }
 
             HorizontalDivider()
             Text(
-                "OpiLink ${BuildConfig.VERSION_NAME}",
+                stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -423,19 +510,75 @@ fun SetupScreen() {
     if (confirmUnpair) {
         AlertDialog(
             onDismissRequest = { confirmUnpair = false },
-            title = { Text("Unpair watch?") },
-            text = { Text("Notifications will stop and a new QR pairing will be needed.") },
+            title = { Text(stringResource(R.string.unpair_title)) },
+            text = { Text(stringResource(R.string.unpair_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     confirmUnpair = false
                     LinkService.stop(context)
                     PairingStore.unpair(context)
                     paired = false
-                }) { Text("Unpair") }
+                }) { Text(stringResource(R.string.unpair)) }
             },
             dismissButton = {
-                TextButton(onClick = { confirmUnpair = false }) { Text("Cancel") }
+                TextButton(onClick = { confirmUnpair = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
+        )
+    }
+
+    if (showLanguagePicker) {
+        AlertDialog(
+            onDismissRequest = { showLanguagePicker = false },
+            title = { Text(stringResource(R.string.language)) },
+            text = {
+                Column {
+                    AppLanguage.options.forEach { option ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = language == option.tag,
+                                    onClick = {
+                                        language = option.tag
+                                        AppLanguage.set(context, option.tag)
+                                    },
+                                    role = Role.RadioButton,
+                                ),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(selected = language == option.tag, onClick = null)
+                            Text(stringResource(option.nameRes))
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showLanguagePicker = false }) {
+                    Text(stringResource(R.string.done))
+                }
+            },
+        )
+    }
+
+    if (showCardEditor) {
+        CardEditorDialog(
+            card = editingCard,
+            onSave = { label, code, note ->
+                val card = OpiCard(
+                    id = editingCard?.id ?: OpiCard.newId(),
+                    label = label,
+                    code = code,
+                    note = note,
+                    onWatch = editingCard?.onWatch == true,
+                )
+                CardStore.upsert(context, card)
+                if (card.onWatch) Router.sendCard(context, card)
+                cards = CardStore.all(context)
+                showCardEditor = false
+            },
+            onDismiss = { showCardEditor = false },
         )
     }
 }
@@ -458,7 +601,7 @@ private fun StepCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(title, fontWeight = FontWeight.Bold)
                 Text(
-                    if (done) "✓ $doneText" else "Not set up",
+                    if (done) "✓ $doneText" else stringResource(R.string.step_not_done),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -512,7 +655,7 @@ private fun AppPickerDialog(onDismiss: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Choose apps") },
+        title = { Text(stringResource(R.string.choose_apps)) },
         text = {
             Column {
                 OutlinedTextField(
@@ -520,10 +663,13 @@ private fun AppPickerDialog(onDismiss: () -> Unit) {
                     onValueChange = { query = it },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    placeholder = { Text("Search") },
+                    placeholder = { Text(stringResource(R.string.search)) },
                 )
                 if (loading) {
-                    Text("Loading…", modifier = Modifier.padding(16.dp))
+                    Text(
+                        stringResource(R.string.loading),
+                        modifier = Modifier.padding(16.dp),
+                    )
                 } else {
                     LazyColumn(modifier = Modifier.height(400.dp)) {
                         items(filtered, key = { it.second }) { (label, pkg) ->
@@ -552,7 +698,61 @@ private fun AppPickerDialog(onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Done") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.done)) }
+        },
+    )
+}
+
+@Composable
+private fun CardEditorDialog(
+    card: OpiCard?,
+    onSave: (label: String, code: String, note: String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var label by remember { mutableStateOf(card?.label ?: "") }
+    var code by remember { mutableStateOf(card?.code ?: "") }
+    var note by remember { mutableStateOf(card?.note ?: "") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                stringResource(if (card == null) R.string.new_card else R.string.edit_card),
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = label,
+                    onValueChange = { label = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.card_label)) },
+                    placeholder = { Text(stringResource(R.string.card_label_placeholder)) },
+                )
+                OutlinedTextField(
+                    value = code,
+                    onValueChange = { code = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.card_code)) },
+                )
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.card_note)) },
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onSave(label.trim(), code.trim(), note.trim()) },
+                enabled = code.isNotBlank(),
+            ) { Text(stringResource(R.string.save)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
     )
 }

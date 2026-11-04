@@ -19,6 +19,11 @@ object ActionExecutor {
         }
 
     fun dismiss(id: String) {
+        val context = OpiListenerService.instance ?: LinkService.instance
+        if (context != null && CardStore.isCard(context, id)) {
+            CardStore.setOnWatch(context, id, false)
+            return
+        }
         val sbn = find(id) ?: return
         Router.markDismissedByWatch(id)
         OpiListenerService.instance?.cancelNotification(sbn.key)
@@ -27,13 +32,13 @@ object ActionExecutor {
     fun run(id: String, idx: Int, label: String, text: String?) {
         val service = OpiListenerService.instance ?: return
         val sbn = find(id) ?: run {
-            AppState.setError("Notification no longer exists")
+            AppState.setError(service.getString(R.string.error_notif_gone))
             return
         }
         val action = sbn.notification.actions?.getOrNull(idx)
         if (action == null || action.title?.toString() != label) {
             Log.w(TAG, "action $idx label mismatch for $id")
-            AppState.setError("Action no longer available")
+            AppState.setError(service.getString(R.string.error_action_gone))
             return
         }
         val options = ActivityOptions.makeBasic()
@@ -53,7 +58,7 @@ object ActionExecutor {
             }
         } catch (e: PendingIntent.CanceledException) {
             Log.w(TAG, "action intent canceled for $id")
-            AppState.setError("Action no longer available")
+            AppState.setError(service.getString(R.string.error_action_gone))
         }
     }
 }

@@ -82,7 +82,7 @@ object FindPhone {
 
         if (!sound && !vibration) {
             restoreVolume(app)
-            AppState.setError("Find phone: couldn't play sound or vibrate")
+            AppState.setError(app.getString(R.string.findphone_no_output))
             broadcastState()
             return
         }
@@ -147,7 +147,11 @@ object FindPhone {
         block()
     } catch (e: Exception) {
         Log.w(TAG, "$step failed", e)
-        AppState.setError("Find phone: $step failed (${e.javaClass.simpleName})")
+        appContext?.let {
+            AppState.setError(
+                it.getString(R.string.findphone_step_failed, step, e.javaClass.simpleName),
+            )
+        }
         null
     }
 
@@ -158,7 +162,11 @@ object FindPhone {
     private fun showNotification(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL, "Find phone", NotificationManager.IMPORTANCE_HIGH),
+            NotificationChannel(
+                CHANNEL,
+                context.getString(R.string.findphone_channel),
+                NotificationManager.IMPORTANCE_HIGH,
+            ),
         )
         val stopPi = PendingIntent.getBroadcast(
             context, 0,
@@ -173,9 +181,9 @@ object FindPhone {
             NOTIF_ID,
             NotificationCompat.Builder(context, CHANNEL)
                 .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                .setContentTitle("Your watch is looking for this phone")
+                .setContentTitle(context.getString(R.string.findphone_notif_title))
                 .setContentIntent(contentPi)
-                .addAction(0, "Stop", stopPi)
+                .addAction(0, context.getString(R.string.findphone_stop), stopPi)
                 .setOngoing(true)
                 .build(),
         )

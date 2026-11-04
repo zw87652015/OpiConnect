@@ -3,6 +3,7 @@ package com.opiconnect.companion
 import android.app.Notification
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.PowerManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -36,6 +37,9 @@ object Router {
 
     fun onPosted(sbn: StatusBarNotification) {
         val context = OpiListenerService.instance ?: return
+        if (ForwardPrefs.screenOffOnly(context) &&
+            context.getSystemService(PowerManager::class.java)?.isInteractive == true
+        ) return
         val payload = buildPayload(context, sbn) ?: return
         val hash = contentHash(payload)
         if (forwarded[payload.i] == hash) return // same content re-posted
@@ -122,6 +126,7 @@ object Router {
     private fun passesFilter(sbn: StatusBarNotification): Boolean {
         val context = OpiListenerService.instance
         if (sbn.packageName == context?.packageName) return false
+        if (context != null && !ForwardPrefs.allows(context, sbn.packageName)) return false
         if (sbn.isOngoing) return false
         // Calendar apps: when watch reminders are active, their notifications would duplicate.
         if (context != null && CalendarSync.hasPermission(context) &&

@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,17 +21,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,7 +66,9 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.opiconnect.companion.core.Crypto
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -260,6 +272,70 @@ fun SetupScreen() {
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    var screenOffOnly by remember {
+                        mutableStateOf(ForwardPrefs.screenOffOnly(context))
+                    }
+                    var mode by remember { mutableStateOf(ForwardPrefs.mode(context)) }
+                    var selectedApps by remember { mutableStateOf(ForwardPrefs.apps(context)) }
+                    var showPicker by remember { mutableStateOf(false) }
+                    Text("5. Forwarding", fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Only when screen is off")
+                        Spacer(modifier = Modifier.weight(1f))
+                        Switch(
+                            checked = screenOffOnly,
+                            onCheckedChange = {
+                                screenOffOnly = it
+                                ForwardPrefs.setScreenOffOnly(context, it)
+                            },
+                        )
+                    }
+                    Text(
+                        "Skip notifications while you're using the phone.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Apps")
+                    listOf(
+                        ForwardPrefs.Mode.ALL to "All apps",
+                        ForwardPrefs.Mode.ALLOW to "Only selected apps",
+                        ForwardPrefs.Mode.BLOCK to "All except selected apps",
+                    ).forEach { (m, label) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = mode == m,
+                                    onClick = {
+                                        mode = m
+                                        ForwardPrefs.setMode(context, m)
+                                    },
+                                    role = Role.RadioButton,
+                                ),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(selected = mode == m, onClick = null)
+                            Text(label)
+                        }
+                    }
+                    if (mode != ForwardPrefs.Mode.ALL) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(onClick = { showPicker = true }) {
+                            Text("Choose apps (${selectedApps.size} selected)")
+                        }
+                    }
+                    if (showPicker) {
+                        AppPickerDialog(onDismiss = {
+                            showPicker = false
+                            selectedApps = ForwardPrefs.apps(context)
+                        })
+                    }
+                }
+            }
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("6. Calendar (optional)", fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
@@ -345,7 +421,7 @@ fun SetupScreen() {
     }
 
     if (confirmUnpair) {
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             onDismissRequest = { confirmUnpair = false },
             title = { Text("Unpair watch?") },
             text = { Text("Notifications will stop and a new QR pairing will be needed.") },
@@ -391,4 +467,92 @@ private fun StepCard(
             }
         }
     }
+}
+
+@Composable
+private fun AppPickerDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    var loading by remember { mutableStateOf(true) }
+    var entries by remember { mutableStateOf(emptyList<Pair<String, String>>()) }
+    var query by remember { mutableStateOf("") }
+    val initial = remember { ForwardPrefs.apps(context) }
+    var selected by remember { mutableStateOf(initial) }
+
+    LaunchedEffect(Unit) {
+        entries = withContext(Dispatchers.IO) {
+            val pm = context.packageManager
+            val launchable = pm.queryIntentActivities(
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+                PackageManager.ResolveInfoFlags.of(0),
+            ).map { it.loadLabel(pm).toString() to it.activityInfo.packageName }
+            val extra = ForwardPrefs.apps(context).map { pkg ->
+                runCatching {
+                    pm.getApplicationLabel(
+                        pm.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0)),
+                    ).toString()
+                }.getOrDefault(pkg) to pkg
+            }
+            (launchable + extra)
+                .distinctBy { it.second }
+                .filter { it.second != context.packageName }
+        }
+        loading = false
+    }
+
+    val filtered = entries
+        .filter {
+            query.isEmpty() ||
+                it.first.contains(query, ignoreCase = true) ||
+                it.second.contains(query, ignoreCase = true)
+        }
+        .sortedWith(
+            compareByDescending<Pair<String, String>> { it.second in initial }
+                .thenBy { it.first.lowercase() },
+        )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Choose apps") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    placeholder = { Text("Search") },
+                )
+                if (loading) {
+                    Text("Loading…", modifier = Modifier.padding(16.dp))
+                } else {
+                    LazyColumn(modifier = Modifier.height(400.dp)) {
+                        items(filtered, key = { it.second }) { (label, pkg) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selected = if (pkg in selected) {
+                                            selected - pkg
+                                        } else {
+                                            selected + pkg
+                                        }
+                                        ForwardPrefs.setApps(context, selected)
+                                    },
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Checkbox(checked = pkg in selected, onCheckedChange = null)
+                                Column {
+                                    Text(label, style = MaterialTheme.typography.bodyLarge)
+                                    Text(pkg, style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Done") }
+        },
+    )
 }

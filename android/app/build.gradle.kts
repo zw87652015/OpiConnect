@@ -9,7 +9,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.opiconnect.companion"
+        applicationId = "uk.luojiajiang.opiconnect"
         minSdk = 34
         targetSdk = 35
         versionCode = 1

@@ -5,8 +5,13 @@ import UserNotifications
 enum NotificationContent {
     static func make(for payload: NotifPayload) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
-        content.title = payload.a
-        content.subtitle = payload.t
+        if let code = OTPDetector.detect(in: payload) {
+            content.title = "Code " + OTPDetector.display(code)
+            content.subtitle = payload.t.isEmpty ? payload.a : "\(payload.a) · \(payload.t)"
+        } else {
+            content.title = payload.a
+            content.subtitle = payload.t
+        }
         content.body = payload.b
         content.threadIdentifier = payload.p
         content.sound = .default

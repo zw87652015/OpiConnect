@@ -38,6 +38,11 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.payload.a).font(.caption2).foregroundStyle(.secondary)
                                 Text(item.payload.t).font(.headline).lineLimit(1)
+                                if let code = OTPDetector.detect(in: item.payload) {
+                                    Label(OTPDetector.display(code), systemImage: "key.fill")
+                                        .font(.headline.monospacedDigit())
+                                        .foregroundStyle(.green)
+                                }
                                 Text(item.payload.b).font(.caption).lineLimit(2)
                             }
                         }

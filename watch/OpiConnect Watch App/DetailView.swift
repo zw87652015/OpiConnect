@@ -10,6 +10,18 @@ struct DetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
+                if let code = OTPDetector.detect(in: payload) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("One-time code").font(.caption2).foregroundStyle(.secondary)
+                        Text(OTPDetector.display(code))
+                            .font(.system(size: 30, weight: .semibold, design: .monospaced))
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(8)
+                    .background(.green.opacity(0.15), in: .rect(cornerRadius: 10))
+                }
                 Text(payload.a).font(.caption2).foregroundStyle(.secondary)
                 Text(payload.t).font(.headline)
                 Text(payload.b).font(.body)

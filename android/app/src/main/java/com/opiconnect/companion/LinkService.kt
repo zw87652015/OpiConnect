@@ -51,6 +51,7 @@ class LinkService : Service() {
         private const val TAG = "OpiLink"
         private const val NOTIF_ID = 1
         private const val CHANNEL = "link"
+        private const val MAX_CHUNK = 182 // iOS/watchOS ATT MTU 185 - 3; larger indications are never confirmed
 
         val SERVICE_UUID: UUID = UUID.fromString("6f70690a-0001-4c6f-9e2b-6f7069636f6e")
         val TX_UUID: UUID = UUID.fromString("6f70690a-0002-4c6f-9e2b-6f7069636f6e") // notify, phone -> watch
@@ -379,7 +380,7 @@ class LinkService : Service() {
         tx ?: return false
         val sealed = runCatching { Crypto.seal(Messages.encode(msg), keys.encKey) }.getOrNull() ?: return false
         synchronized(conn) {
-            conn.messages.add(Outgoing(Chunker.split(sealed, maxOf(2, conn.mtu - 3)), msg is Messages.Cal))
+            conn.messages.add(Outgoing(Chunker.split(sealed, maxOf(2, minOf(conn.mtu - 3, MAX_CHUNK))), msg is Messages.Cal))
         }
         pump(conn)
         return true

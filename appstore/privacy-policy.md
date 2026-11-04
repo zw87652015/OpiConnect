@@ -128,4 +128,4 @@ OpiLink 并非面向儿童，我们不会有意收集儿童的个人信息。
 
 ## 联系方式
 
-如有疑问，请在 https://github.com/zw87652015/OpiConnect/issues 提交 issue，或发送邮件至 `<your email>`。
+如有疑问，请在 https://github.com/zw87652015/OpiConnect/issues 提交 issue，或发送邮件至 `me@luojiajiang.uk`。

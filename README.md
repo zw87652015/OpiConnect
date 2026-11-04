@@ -42,7 +42,7 @@ connected; otherwise it's queued on the watch and sent when it next connects.
 - **Complications** — phone battery, next event, Find Phone and Music quick-launch
 
 Adding complications: long-press the watch face → Edit → Complications → pick a slot →
-OpiConnect. They're also available in the Smart Stack.
+OpiLink. They're also available in the Smart Stack.
 
 ## Limitations
 
@@ -95,9 +95,8 @@ automatically; TestFlight/App Store builds use production.
 Or run `scripts/testflight.sh` (archive + upload; `DESTINATION=export` builds a local
 .ipa without uploading). TestFlight builds expire after 90 days, so re-run it before then.
 App Store Connect will ask about **export compliance**: the app uses AES-GCM for
-end-to-end encryption — answer the questionnaire for your situation (standard
-OS-provided crypto usually qualifies for an exemption, but the answer is your
-responsibility). For **App Review**, note that the reviewer has no Android phone:
+end-to-end encryption of user data, which is generally not one of Apple's exempt uses
+(see `appstore/app-store-connect.md`); the answer is your responsibility. For **App Review**, note that the reviewer has no Android phone:
 attach a demo video and explain in the review notes.
 
 ### 3. Android app
@@ -111,8 +110,8 @@ Walk through the in-app setup cards: grant Bluetooth + notification permissions,
 enable notification access, allow the battery exemption, and optionally grant
 **calendar access** (powers the watch calendar + reminders — skipped if denied).
 **OPPO/ColorOS:** also
-enable *Battery > App battery management > OpiConnect > allow background activity*
-and *auto launch*, and lock OpiConnect in Recents so ColorOS doesn't kill it.
+enable *Battery > App battery management > OpiLink > allow background activity*
+and *auto launch*, and lock OpiLink in Recents so ColorOS doesn't kill it.
 
 ### 4. Pairing
 

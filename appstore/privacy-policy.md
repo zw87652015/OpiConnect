@@ -61,7 +61,7 @@ We'll post any changes on this page and update the date above.
 
 ## Contact
 
-Questions: open an issue at https://github.com/zw87652015/OpiConnect/issues or email `<your email>`.
+Questions: open an issue at https://github.com/zw87652015/OpiConnect/issues or email `me@luojiajiang.uk`.
 
 ---
 

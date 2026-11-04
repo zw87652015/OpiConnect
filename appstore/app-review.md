@@ -6,7 +6,7 @@
 
 ## Contact information
 
-First name, last name, phone, email: your details (**fill in**).
+Luojia Jiang, email: me@luojiajiang.uk.
 
 ## Notes for the reviewer (paste into "Notes", max 4000)
 

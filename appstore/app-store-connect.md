@@ -66,7 +66,7 @@ The usual path for an app like this:
 | Field | Value |
 | --- | --- |
 | Version | 1.0 |
-| Copyright | `2026 Luojia Jiang` (**DECIDE**: this should be the legal name on your developer account) |
+| Copyright | `2026 Luojia Jiang`|
 | Build | The latest TestFlight build after the OpiLink rename (the build uploaded on 2026-11-04 still says "OpiConnect" on the watch) |
 | Release | Manual release recommended for 1.0 |
 

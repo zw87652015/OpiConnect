@@ -14,8 +14,8 @@ android {
         applicationId = "uk.luojiajiang.opiconnect"
         minSdk = 34
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
         buildConfigField("String", "RELAY_URL", "\"${property("opi.relayUrl")}\"")
     }
@@ -69,7 +69,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp)
-    implementation(libs.play.services.code.scanner)
+    implementation(libs.zxing.android.embedded)
 
     testImplementation(libs.junit)
     testImplementation(libs.json)

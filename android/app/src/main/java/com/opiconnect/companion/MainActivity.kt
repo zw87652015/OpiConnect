@@ -67,9 +67,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.opiconnect.companion.core.Crypto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -174,6 +173,21 @@ fun SetupScreen() {
         if (it) CalendarSync.sendUpdates()
     }
 
+    val scanLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
+        if (result.contents == null) return@rememberLauncherForActivityResult
+        val k = Crypto.parseQr(result.contents)
+        if (k != null && PairingStore.pair(context, k)) {
+            paired = true
+            LinkService.start(context)
+        } else {
+            scope.launch {
+                snackbar.showSnackbar(
+                    context.getString(R.string.not_opi_qr),
+                )
+            }
+        }
+    }
+
     // Opening the app while the phone rings stops it.
     LaunchedEffect(Unit) {
         if (FindPhone.ringing.value) FindPhone.stop(context)
@@ -272,24 +286,13 @@ fun SetupScreen() {
                         }
                     } else {
                         Button(onClick = {
-                            val options = GmsBarcodeScannerOptions.Builder()
-                                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                                .build()
-                            GmsBarcodeScanning.getClient(context, options)
-                                .startScan()
-                                .addOnSuccessListener { barcode ->
-                                    val k = Crypto.parseQr(barcode.rawValue)
-                                    if (k != null && PairingStore.pair(context, k)) {
-                                        paired = true
-                                        LinkService.start(context)
-                                    } else {
-                                        scope.launch {
-                                            snackbar.showSnackbar(
-                                                context.getString(R.string.not_opi_qr),
-                                            )
-                                        }
-                                    }
-                                }
+                            scanLauncher.launch(
+                                ScanOptions()
+                                    .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                                    .setOrientationLocked(false)
+                                    .setBeepEnabled(false)
+                                    .setPrompt(context.getString(R.string.scan_watch_qr)),
+                            )
                         }) {
                             Text(stringResource(R.string.scan_watch_qr))
                         }

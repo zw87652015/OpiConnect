@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpiLink 宣传动画</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #e9ecf5; overflow: hidden; }
+  body { font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif; color: #141832; cursor: pointer; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1080px; height: 1920px; transform-origin: center; overflow: hidden;
+    background: #f6f7fc; }
+  .abs { position: absolute; }
+  .cx { left: 50%; }
+  .play * { animation-duration: 10s; animation-iteration-count: 1; animation-fill-mode: both; animation-timing-function: cubic-bezier(.45,.05,.25,1); }
+
+  /* background */
+  .blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .6; }
+  .b1 { width: 900px; height: 900px; left: -260px; top: -200px; background: #b9c6ff; }
+  .b2 { width: 800px; height: 800px; right: -300px; top: 700px; background: #a6ecd6; }
+  .b3 { width: 700px; height: 700px; left: 120px; bottom: -320px; background: #e1c8ff; }
+  .play .b1 { animation-name: drift1; animation-timing-function: ease-in-out; }
+  .play .b2 { animation-name: drift2; animation-timing-function: ease-in-out; }
+  .play .b3 { animation-name: drift3; animation-timing-function: ease-in-out; }
+  @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(220px,160px); } }
+  @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-200px,-240px); } }
+  @keyframes drift3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(180px,-120px); } }
+  .grid { position: absolute; inset: 0; opacity: .1;
+    background-image: linear-gradient(rgba(40,50,110,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(40,50,110,.5) 1px, transparent 1px);
+    background-size: 90px 90px; -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%); mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%); }
+
+  /* headline */
+  .h1 { position: absolute; left: 0; right: 0; text-align: center; font-size: 104px; font-weight: 700; letter-spacing: 6px; line-height: 1; }
+  .l1 { top: 200px; }
+  .l2 { top: 340px; }
+  .grad { background: linear-gradient(90deg, #10b981, #3b82f6 55%, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .play .l1 { animation-name: l1; }
+  .play .l2 { animation-name: l2; }
+  @keyframes l1 { 0%,2% { opacity: 0; transform: translateY(40px); filter: blur(10px); } 7% { opacity: 1; transform: none; filter: none; } 79% { opacity: 1; transform: none; } 82%,100% { opacity: 0; transform: translateY(-30px); } }
+  @keyframes l2 { 0%,30% { opacity: 0; transform: translateY(40px); filter: blur(10px); } 35% { opacity: 1; transform: none; filter: none; } 79% { opacity: 1; transform: none; } 82%,100% { opacity: 0; transform: translateY(-30px); } }
+
+  /* phone */
+  .phone { top: 500px; width: 500px; height: 1040px; transform: translateX(-50%); }
+  .play .phone { animation-name: phoneMove; }
+  @keyframes phoneMove {
+    0% { opacity: 0; transform: translate(-50%, 120px) scale(.94); }
+    5% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    22% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    31%,100% { opacity: 0; transform: translate(-50%, -320px) scale(.78); }
+  }
+  .phoneBody { width: 100%; height: 100%; border-radius: 70px; padding: 14px; background: linear-gradient(145deg, #ffffff, #d5d9e4 55%, #eef0f6);
+    box-shadow: 0 50px 110px rgba(40,50,110,.25), inset 0 0 0 2px rgba(255,255,255,.9), inset 0 0 0 4px rgba(40,50,110,.12); }
+  .play .phoneBody { animation-name: buzz; animation-timing-function: linear; }
+  @keyframes buzz { 0%,11% { transform: none; } 11.5% { transform: translateX(-7px) rotate(-.6deg); } 12% { transform: translateX(7px) rotate(.6deg); } 12.5% { transform: translateX(-5px); } 13% { transform: translateX(4px); } 13.5%,100% { transform: none; } }
+  .pscreen { position: relative; width: 100%; height: 100%; border-radius: 58px; overflow: hidden; color: #141832;
+    background: radial-gradient(circle at 20% 15%, #c9cffff0 0%, transparent 55%), radial-gradient(circle at 85% 80%, #b8f0de 0%, transparent 55%), #eef0fa; }
+  .cam { position: absolute; top: 22px; left: 50%; width: 26px; height: 26px; margin-left: -13px; border-radius: 50%; background: #05060a; box-shadow: inset 0 0 0 4px #1b1d26; }
+  .sbar { position: absolute; top: 22px; left: 40px; right: 40px; display: flex; justify-content: space-between; font-size: 22px; font-weight: 600; opacity: .9; }
+  .batt { width: 40px; height: 20px; border: 2px solid #141832; border-radius: 5px; padding: 2px; }
+  .batt i { display: block; width: 75%; height: 100%; background: #141832; border-radius: 2px; }
+  .clock { position: absolute; top: 120px; width: 100%; text-align: center; font-size: 150px; font-weight: 300; letter-spacing: 4px; }
+  .date { position: absolute; top: 290px; width: 100%; text-align: center; font-size: 28px; opacity: .8; }
+
+  .note { width: 440px; height: 190px; border-radius: 34px; padding: 20px 24px; background: rgba(255,255,255,.78); color: #141832;
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(40,50,110,.15); }
+  .note .ico { color: #fff; }
+  .note .row { display: flex; align-items: center; gap: 12px; font-size: 22px; opacity: .85; height: 32px; }
+  .note .ico { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-size: 18px; font-weight: 700; }
+  .note .row span:last-child { margin-left: auto; opacity: .7; }
+  .note b { display: block; font-size: 28px; margin-top: 10px; }
+  .note p { font-size: 24px; line-height: 1.4; margin-top: 6px; opacity: .92; }
+  .pnote { position: absolute; left: 16px; top: 360px; }
+  .play .bank { animation-name: bankIn; }
+  .play .parcel { animation-name: parcelIn; }
+  @keyframes bankIn { 0%,10% { opacity: 0; transform: translateY(-60px) scale(.92); } 12.5% { opacity: 1; transform: translateY(6px) scale(1.01); } 14% { opacity: 1; transform: none; } 21.9% { opacity: 1; } 22%,100% { opacity: 0; } }
+  @keyframes parcelIn { 0%,5% { opacity: 0; transform: translateY(-264px) scale(.92); } 7.5% { opacity: 1; transform: translateY(-204px); } 10% { transform: translateY(-204px); } 12.5% { transform: translateY(0); } 22% { opacity: 1; transform: none; } 27%,100% { opacity: 0; transform: none; } }
+
+  /* flying notification */
+  .fly { top: 874px; transform: translateX(-50%); z-index: 5; }
+  .fly .note { background: #fff; box-shadow: 0 0 0 3px rgba(16,185,129,.55), 0 20px 60px rgba(59,130,246,.35); }
+  .play .fly { animation-name: fly; }
+  @keyframes fly {
+    0%,21.9% { opacity: 0; transform: translate(-50%, 0) scale(1); }
+    22% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    24.5% { opacity: 1; transform: translate(-50%, -24px) scale(1.06); }
+    31% { opacity: 1; transform: translate(-50%, 122px) scale(.5); }
+    33%,100% { opacity: 0; transform: translate(-50%, 122px) scale(.3); }
+  }
+  .lock { position: absolute; left: 50%; top: -74px; transform: translateX(-50%); white-space: nowrap; display: flex; align-items: center; gap: 10px;
+    padding: 10px 22px; border-radius: 999px; font-size: 26px; font-weight: 600; color: #fff; background: linear-gradient(90deg, #10b981, #3b82f6); box-shadow: 0 8px 24px rgba(59,130,246,.35); }
+  .play .lock { animation-name: lockIn; }
+  @keyframes lockIn { 0%,22.5% { opacity: 0; transform: translate(-50%, 20px) scale(.8); } 24.5% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 1; transform: translate(-50%, 0); } }
+
+  /* watch */
+  .watchWrap { top: 760px; width: 560px; height: 662px; transform: translateX(-50%); }
+  .play .watchWrap { animation-name: watchMove; }
+  @keyframes watchMove {
+    0%,21% { opacity: 0; transform: translate(-50%, 420px) scale(.9); }
+    29% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    79% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    86%,100% { opacity: 1; transform: translate(-50%, 40px) scale(.78); }
+  }
+  .strap { position: absolute; left: 80px; width: 400px; height: 300px; background: linear-gradient(90deg, #c9cdd8, #e4e7ee 50%, #c9cdd8); }
+  .strap.t { top: -260px; border-radius: 40px 40px 0 0; -webkit-mask-image: linear-gradient(to top, #000 30%, transparent); mask-image: linear-gradient(to top, #000 30%, transparent); }
+  .strap.b { bottom: -260px; border-radius: 0 0 40px 40px; -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent); mask-image: linear-gradient(to bottom, #000 30%, transparent); }
+  .watch { position: absolute; inset: 0; }
+  .play .watch { animation-name: wbuzz; animation-timing-function: linear; }
+  @keyframes wbuzz { 0%,31.5% { transform: none; } 32% { transform: translateX(-8px) rotate(-.8deg); } 32.5% { transform: translateX(8px) rotate(.8deg); } 33% { transform: translateX(-6px); } 33.5% { transform: translateX(4px); } 34%,100% { transform: none; } }
+  .wbody { position: absolute; inset: 0; border-radius: 150px; padding: 45px; background: linear-gradient(145deg, #ffffff, #c8ccd8 55%, #e8eaf1);
+    box-shadow: 0 50px 120px rgba(40,50,110,.3), inset 0 0 0 3px rgba(255,255,255,.9), inset 0 0 0 5px rgba(40,50,110,.12); }
+  .crown { position: absolute; right: -22px; top: 150px; width: 34px; height: 96px; border-radius: 12px; background: linear-gradient(90deg, #b9bdc9, #f4f5f8); }
+  .btn { position: absolute; right: -14px; top: 290px; width: 22px; height: 130px; border-radius: 10px; background: linear-gradient(90deg, #b9bdc9, #eceef3); }
+  .wscreen { position: relative; width: 470px; height: 572px; border-radius: 108px; overflow: hidden; background: #000; box-shadow: 0 0 0 18px #0d0e12; }
+  .wscreen img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; }
+  .flash { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle, rgba(124,243,200,.9), rgba(122,168,255,.3) 50%, transparent 75%); }
+  .play .flash { animation-name: flash; }
+  @keyframes flash { 0%,29.5% { opacity: 0; } 31.5% { opacity: 1; } 35%,100% { opacity: 0; } }
+  .play .s-otp { animation-name: sOtp; }
+  .play .s-cal { animation-name: sCal; }
+  .play .s-mus { animation-name: sMus; }
+  .play .s-find { animation-name: sFind; }
+  .play .s-home { animation-name: sHome; }
+  @keyframes sOtp { 0%,31% { opacity: 0; transform: scale(1.12); } 33.5% { opacity: 1; transform: none; } 47% { opacity: 1; transform: none; } 49%,100% { opacity: 0; transform: translateY(-60px); } }
+  @keyframes sCal { 0%,47% { opacity: 0; transform: translateY(80px); } 49% { opacity: 1; transform: none; } 58% { opacity: 1; transform: none; } 60%,100% { opacity: 0; transform: translateY(-60px); } }
+  @keyframes sMus { 0%,58% { opacity: 0; transform: translateY(80px); } 60% { opacity: 1; transform: none; } 69% { opacity: 1; transform: none; } 71%,100% { opacity: 0; transform: translateY(-60px); } }
+  @keyframes sFind { 0%,69% { opacity: 0; transform: translateY(80px); } 71% { opacity: 1; transform: none; } 79% { opacity: 1; transform: none; } 81%,100% { opacity: 0; transform: translateY(-60px); } }
+  @keyframes sHome { 0%,79% { opacity: 0; transform: translateY(80px); } 81%,100% { opacity: 1; transform: none; } }
+
+  .ring { position: absolute; inset: 0; border-radius: 150px; border: 4px solid rgba(16,185,129,.7); opacity: 0; }
+  .play .r1 { animation-name: ring; animation-timing-function: ease-out; }
+  .play .r2 { animation-name: ring; animation-timing-function: ease-out; animation-delay: .25s; }
+  @keyframes ring { 0%,31% { opacity: 0; transform: scale(1); } 32% { opacity: .9; transform: scale(1); } 42%,100% { opacity: 0; transform: scale(1.45); } }
+
+  /* feature captions */
+  .cap { top: 1530px; transform: translateX(-50%); white-space: nowrap; display: flex; align-items: center; gap: 18px; padding: 24px 44px; border-radius: 999px;
+    font-size: 44px; font-weight: 600; letter-spacing: 2px; background: rgba(255,255,255,.75); border: 2px solid #fff; box-shadow: 0 14px 40px rgba(40,50,110,.12);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); opacity: 0; }
+  .cap i { width: 18px; height: 18px; border-radius: 50%; background: var(--c); box-shadow: 0 0 20px var(--c); }
+  .cap em { font-style: normal; opacity: .65; font-weight: 400; }
+  .play .cap { animation-name: cap; animation-delay: var(--d); }
+  @keyframes cap { 0% { opacity: 0; transform: translate(-50%, 30px); } 2% { opacity: 1; transform: translate(-50%, 0); } 11% { opacity: 1; transform: translate(-50%, 0); } 13%,100% { opacity: 0; transform: translate(-50%, -20px); } }
+
+  /* end card */
+  .end { position: absolute; left: 0; right: 0; text-align: center; }
+  .appicon { top: 170px; left: 50%; width: 180px; height: 180px; margin-left: -90px; border-radius: 44px; display: grid; place-items: center;
+    background: linear-gradient(145deg, #262a4a, #12142a); box-shadow: 0 30px 70px rgba(40,50,110,.3), inset 0 0 0 2px rgba(255,255,255,.1); }
+  .name { top: 400px; font-size: 140px; font-weight: 800; letter-spacing: 2px; line-height: 1; }
+  .sub { top: 580px; font-size: 46px; opacity: .85; letter-spacing: 2px; }
+  .chips { top: 1530px; display: flex; justify-content: center; gap: 20px; }
+  .chips span { padding: 16px 30px; border-radius: 999px; font-size: 34px; background: rgba(255,255,255,.75); border: 2px solid #fff; box-shadow: 0 10px 30px rgba(40,50,110,.1); }
+  .cta { top: 1670px; left: 50%; transform: translateX(-50%); padding: 30px 70px; border-radius: 999px; white-space: nowrap; font-size: 48px; font-weight: 700; color: #fff;
+    background: linear-gradient(90deg, #10b981, #3b82f6 55%, #8b5cf6); box-shadow: 0 20px 60px rgba(59,130,246,.4); }
+  .play .appicon { animation-name: eIcon; }
+  .play .name { animation-name: eA; }
+  .play .sub { animation-name: eB; }
+  .play .chips { animation-name: eC; }
+  .play .cta { animation-name: eCta; }
+  @keyframes eIcon { 0%,80% { opacity: 0; transform: scale(.4) rotate(-20deg); } 84% { opacity: 1; transform: scale(1.08) rotate(4deg); } 86%,100% { opacity: 1; transform: none; } }
+  @keyframes eA { 0%,82% { opacity: 0; transform: translateY(50px); letter-spacing: 30px; } 86%,100% { opacity: 1; transform: none; letter-spacing: 2px; } }
+  @keyframes eB { 0%,84% { opacity: 0; transform: translateY(40px); } 88%,100% { opacity: .85; transform: none; } }
+  @keyframes eC { 0%,86% { opacity: 0; transform: translateY(40px); } 90%,100% { opacity: 1; transform: none; } }
+  @keyframes eCta { 0%,88% { opacity: 0; transform: translate(-50%, 40px) scale(.9); } 92% { opacity: 1; transform: translate(-50%, 0) scale(1.04); } 94% { transform: translate(-50%, 0) scale(1); } 100% { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+  .shine { position: absolute; inset: 0; border-radius: 999px; overflow: hidden; }
+  .shine::after { content: ""; position: absolute; top: 0; bottom: 0; width: 120px; left: -160px; transform: skewX(-20deg); background: rgba(255,255,255,.6); }
+  .play .shine::after { animation: shine 10s both; }
+  @keyframes shine { 0%,93% { left: -160px; } 97%,100% { left: 120%; } }
+
+  .fade { position: absolute; inset: 0; background: #f6f7fc; pointer-events: none; z-index: 10; }
+  .play .fade { animation-name: fade; animation-timing-function: linear; }
+  @keyframes fade { 0% { opacity: 1; } 3%,100% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="stage" class="play">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="grid"></div>
+
+  <div class="h1 l1">安卓手机通知，</div>
+  <div class="h1 l2"><span class="grad">戴在手腕上。</span></div>
+
+  <div class="abs cx phone">
+    <div class="phoneBody"><div class="pscreen">
+      <div class="cam"></div>
+      <div class="sbar"><span>11:21</span><span class="batt"><i></i></span></div>
+      <div class="clock">11:21</div>
+      <div class="date">11月4日 星期三</div>
+      <div class="note pnote parcel">
+        <div class="row"><span class="ico" style="background:#f59e0b">递</span><span>快递</span><span>2 分钟前</span></div>
+        <b>包裹已到驿站</b>
+        <p>您的包裹已放入驿站，取件码 6-2-1035。</p>
+      </div>
+      <div class="note pnote bank">
+        <div class="row"><span class="ico" style="background:#22c55e">银</span><span>银行</span><span>现在</span></div>
+        <b>登录验证</b>
+        <p>您的验证码为 482913，10 分钟内有效，请勿泄露。</p>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="abs cx watchWrap">
+    <div class="strap t"></div><div class="strap b"></div>
+    <div class="ring r1"></div><div class="ring r2"></div>
+    <div class="watch">
+      <div class="crown"></div><div class="btn"></div>
+      <div class="wbody"><div class="wscreen">
+        <img class="s-otp" src="../screenshots/zh-Hans/03-otp.png" alt="">
+        <img class="s-cal" src="../screenshots/zh-Hans/04-calendar.png" alt="">
+        <img class="s-mus" src="../screenshots/zh-Hans/05-music.png" alt="">
+        <img class="s-find" src="../screenshots/zh-Hans/06-findphone.png" alt="">
+        <img class="s-home" src="../screenshots/zh-Hans/01-home.png" alt="">
+        <div class="flash"></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="abs cx fly">
+    <div class="lock"><svg width="26" height="26" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="#fff"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="#fff" stroke-width="2.4" fill="none"/></svg>端到端加密</div>
+    <div class="note">
+      <div class="row"><span class="ico" style="background:#22c55e">银</span><span>银行</span><span>现在</span></div>
+      <b>登录验证</b>
+      <p>您的验证码为 482913，10 分钟内有效，请勿泄露。</p>
+    </div>
+  </div>
+
+  <div class="abs cx cap" style="--c:#7cf3c8;--d:3.4s"><i></i>验证码<em>·</em>大字一眼看清</div>
+  <div class="abs cx cap" style="--c:#ff7a7a;--d:4.9s"><i></i>日历<em>·</em>日程准时提醒</div>
+  <div class="abs cx cap" style="--c:#c79bff;--d:6.0s"><i></i>音乐<em>·</em>表冠调节音量</div>
+  <div class="abs cx cap" style="--c:#ffc56b;--d:7.1s"><i></i>查找手机<em>·</em>静音也会响</div>
+
+  <div class="abs appicon"><svg width="110" height="110" viewBox="0 0 64 64"><path d="M32 8c-10.5 0-18 8.2-18 19v11l-6 8h48l-6-8V27c0-10.8-7.5-19-18-19z" fill="#fff"/><circle cx="32" cy="53" r="5.5" fill="#fff"/></svg></div>
+  <div class="end name"><span class="grad">OpiLink</span></div>
+  <div class="end sub">在 Apple Watch 上收安卓手机通知</div>
+  <div class="end chips"><span>端到端加密</span><span>无账户 · 无广告</span><span>代码开源</span></div>
+  <div class="abs cta">App Store 搜索「OpiLink」<div class="shine"></div></div>
+
+  <div class="fade"></div>
+</div>
+<script>
+  const stage = document.getElementById('stage');
+  const fit = () => { const s = Math.min(innerWidth / 1080, innerHeight / 1920); stage.style.transform = `translate(-50%, -50%) scale(${s})`; };
+  addEventListener('resize', fit); fit();
+  addEventListener('click', () => { stage.classList.remove('play'); void stage.offsetWidth; stage.classList.add('play'); });
+  const t = parseFloat(new URLSearchParams(location.search).get('t'));
+  if (!isNaN(t)) document.getAnimations().forEach(a => { a.pause(); a.currentTime = t * 1000; });
+</script>
+</body>
+</html>

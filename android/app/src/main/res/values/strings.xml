@@ -42,7 +42,7 @@
     <string name="calendar_denied_desc">Powers the watch calendar and on-wrist reminders.</string>
     <string name="grant_calendar">Grant calendar access</string>
     <string name="step_cards">7. Cards</string>
-    <string name="cards_desc">Make a card for a pickup or redeem code and send it to your watch. It stays there until you dismiss it.</string>
+    <string name="cards_desc">Make a card with any text and send it to your watch. It stays there until you dismiss it.</string>
     <string name="on_watch">On watch</string>
     <string name="send">Send</string>
     <string name="edit">Edit</string>
@@ -67,10 +67,10 @@
     <string name="loading">Loading…</string>
     <string name="done">Done</string>
     <string name="edit_card">Edit card</string>
-    <string name="card_label">Label</string>
-    <string name="card_label_placeholder">McDonald\'s · Pickup code</string>
-    <string name="card_code">Code</string>
+    <string name="card_label">Title</string>
+    <string name="card_code">Content</string>
     <string name="card_note">Note</string>
+    <string name="card_preview">Preview on watch</string>
     <string name="save">Save</string>
 
     <string name="error_bg_service">Couldn\'t start background service — open OpiLink</string>

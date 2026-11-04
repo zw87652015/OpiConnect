@@ -42,7 +42,7 @@
     <string name="calendar_denied_desc">为手表日历和腕上提醒提供数据。</string>
     <string name="grant_calendar">授予日历权限</string>
     <string name="step_cards">7. 卡片</string>
-    <string name="cards_desc">为取餐码或兑换码制作卡片并发送到手表。它会一直保留，直到你将其关闭。</string>
+    <string name="cards_desc">制作包含任意文字的卡片并发送到手表。它会一直保留，直到你将其关闭。</string>
     <string name="on_watch">在手表上</string>
     <string name="send">发送</string>
     <string name="edit">编辑</string>
@@ -67,10 +67,10 @@
     <string name="loading">加载中…</string>
     <string name="done">完成</string>
     <string name="edit_card">编辑卡片</string>
-    <string name="card_label">名称</string>
-    <string name="card_label_placeholder">麦当劳 · 取餐码</string>
-    <string name="card_code">号码</string>
+    <string name="card_label">标题</string>
+    <string name="card_code">内容</string>
     <string name="card_note">备注</string>
+    <string name="card_preview">手表预览</string>
     <string name="save">保存</string>
 
     <string name="error_bg_service">无法启动后台服务——请打开 OpiLink</string>

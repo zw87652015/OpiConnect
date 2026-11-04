@@ -15,7 +15,7 @@ class CardPayloadTest {
     fun fieldMapping() {
         val p = cardPayload("cardId123", "McDonald's · Pickup code", "365", "Counter 3")
         assertEquals("cardId123", p.i)
-        assertEquals(CARD_PACKAGE, p.p)
+        assertEquals("$CARD_PACKAGE.${p.i}", p.p)
         assertEquals("McDonald's · Pickup code", p.a)
         assertEquals("365", p.t)
         assertEquals("Counter 3", p.b)

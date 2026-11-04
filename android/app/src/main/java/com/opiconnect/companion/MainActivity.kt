@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -53,11 +55,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -728,7 +732,6 @@ private fun CardEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     label = { Text(stringResource(R.string.card_label)) },
-                    placeholder = { Text(stringResource(R.string.card_label_placeholder)) },
                 )
                 OutlinedTextField(
                     value = code,
@@ -743,6 +746,8 @@ private fun CardEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.card_note)) },
                 )
+                Text(stringResource(R.string.card_preview), style = MaterialTheme.typography.labelMedium)
+                WatchCardPreview(label.trim(), code.trim(), note.trim())
             }
         },
         confirmButton = {
@@ -755,4 +760,40 @@ private fun CardEditorDialog(
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
     )
+}
+
+// Mirrors the watch notification row: app label caption, code headline, note body.
+@Composable
+private fun WatchCardPreview(label: String, code: String, note: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF222222), RoundedCornerShape(16.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Text(
+            label.ifEmpty { "OpiLink" },
+            color = Color(0xFF9A9A9A),
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            code.ifEmpty { "—" },
+            color = Color.White,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (note.isNotEmpty()) {
+            Text(
+                note,
+                color = Color.White,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
 }

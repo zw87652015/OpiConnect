@@ -15,7 +15,9 @@ fun cardPayload(
     bc: Boolean? = null,
 ): NotifPayload = NotifPayload(
     i = id,
-    p = CARD_PACKAGE,
+    // Per-card package: the watch threads notifications by `p`, so a shared value
+    // would stack every card under the newest one.
+    p = "$CARD_PACKAGE.$id",
     a = label,
     t = code,
     b = note,

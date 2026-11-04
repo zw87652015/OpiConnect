@@ -129,8 +129,19 @@ struct NextEventProvider: TimelineProvider {
         let now = Date()
         var entries = [EventEntry(date: now, event: nextEvent(after: now))]
         // Refresh as each of the next 10 events ends.
+        var dates: [Date] = []
         for event in (store.calendar()?.events ?? []).filter({ $0.endDate > now }).prefix(10) {
-            entries.append(EventEntry(date: event.endDate, event: nextEvent(after: event.endDate)))
+            dates.append(event.endDate)
+            if !event.ad, event.startDate > now { dates.append(event.startDate) } // "Now" label
+        }
+        // Also at the next two midnights, so "Tomorrow" becomes today's time.
+        var midnight = Calendar.current.startOfDay(for: now)
+        for _ in 0..<2 {
+            midnight = Calendar.current.date(byAdding: .day, value: 1, to: midnight)!
+            dates.append(midnight)
+        }
+        for date in Set(dates).sorted() {
+            entries.append(EventEntry(date: date, event: nextEvent(after: date)))
         }
         completion(Timeline(entries: entries, policy: .atEnd))
     }
@@ -153,15 +164,34 @@ private struct NextEventView: View {
     @Environment(\.widgetFamily) var family
     let entry: EventEntry
 
+    // "14:00" today, "Tomorrow 14:00", "Fri 14:00" within a week, else "8 Nov 14:00".
+    // Relative to the entry date so each timeline entry renders its own day label.
     private var timeString: String {
         guard let e = entry.event else { return "" }
+        var cal = Calendar.current
         let f = DateFormatter()
         if e.ad {
-            f.setLocalizedDateFormatFromTemplate("d MMM")
-        } else {
-            f.setLocalizedDateFormatFromTemplate("jmm")
+            // All-day events are stored at UTC midnight of their date.
+            cal.timeZone = TimeZone(identifier: "UTC")!
+            f.timeZone = cal.timeZone
         }
-        return f.string(from: e.startDate)
+        let today = Calendar.current.dateComponents([.year, .month, .day], from: entry.date)
+        let eventDay = cal.dateComponents([.year, .month, .day], from: e.startDate)
+        let days = Calendar.current.dateComponents([.day],
+            from: Calendar.current.date(from: today)!, to: Calendar.current.date(from: eventDay)!).day ?? 0
+        let started = !e.ad && e.startDate <= entry.date
+        let day: String
+        switch days {
+        case ...0: day = started ? "Now" : (e.ad ? "Today" : "")
+        case 1: day = "Tomorrow"
+        case 2...6: f.setLocalizedDateFormatFromTemplate("EEE"); day = f.string(from: e.startDate)
+        default: f.setLocalizedDateFormatFromTemplate("d MMM"); day = f.string(from: e.startDate)
+        }
+        if e.ad { return day }
+        f.setLocalizedDateFormatFromTemplate("jmm")
+        let time = f.string(from: e.startDate)
+        if day == "Now" { return "Now · until \(f.string(from: e.endDate))" }
+        return day.isEmpty ? time : "\(day) \(time)"
     }
 
     var body: some View {
@@ -173,6 +203,7 @@ private struct NextEventView: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(e.t.isEmpty ? "(No title)" : e.t).font(.headline).lineLimit(1)
                     Text(e.ad ? "\(timeString) · All day" : timeString)
+                        .lineLimit(1)
                         .font(.caption2).foregroundStyle(.secondary)
                     if !e.loc.isEmpty {
                         Text(e.loc).font(.caption2).foregroundStyle(.secondary).lineLimit(1)

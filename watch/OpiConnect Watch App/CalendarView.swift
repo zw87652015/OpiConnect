@@ -2,6 +2,26 @@ import SwiftUI
 
 struct CalendarView: View {
     @EnvironmentObject private var model: AppModel
+    @StateObject private var link = PhoneLink.shared
+    @State private var syncing = false
+
+    // Asks the phone to re-read its calendar and resend it, even if unchanged.
+    private var syncButton: some View {
+        Button {
+            syncing = true
+            link.send(.calSync)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 30) { syncing = false }
+        } label: {
+            if syncing {
+                HStack { ProgressView().frame(width: 20); Text("Syncing…") }
+            } else if link.canWrite {
+                Label("Sync now", systemImage: "arrow.clockwise")
+            } else {
+                Label("Phone not connected", systemImage: "iphone.slash")
+            }
+        }
+        .disabled(syncing || !link.canWrite)
+    }
 
     // Groups events by (local) day; all-day events group under their UTC calendar date.
     private var groups: [(String, [CalEvent])] {
@@ -54,6 +74,7 @@ struct CalendarView: View {
                         Text("Updated \(updated, style: .relative) ago")
                             .font(.caption2).foregroundStyle(.secondary)
                     }
+                    syncButton
                 }
             } else {
                 VStack(spacing: 8) {
@@ -63,10 +84,12 @@ struct CalendarView: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+                    syncButton
                 }
             }
         }
         .navigationTitle("Calendar")
+        .onChange(of: model.calendar?.updatedAt) { syncing = false }
         .navigationDestination(for: String.self) { key in
             if let event = model.calendar?.events.first(where: { $0.k == key }) {
                 EventDetailView(event: event)

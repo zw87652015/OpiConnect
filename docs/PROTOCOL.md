@@ -133,6 +133,7 @@ Watch → phone:
 | `action`  | `{"type":"action","id":"<id>","idx":<int>,"label":"<label>","text":"<string>"?}` | run Android action `idx`; `text` fills RemoteInput |
 | `findphone` | `{"type":"findphone","on":<bool>}` | start/stop ringing the phone |
 | `media`   | `{"type":"media","cmd":"toggle"\|"play"\|"pause"\|"next"\|"prev"\|"vol","v":<0.0-1.0>?}` | media control; `v` only with `vol` |
+| `cal_sync` | `{"type":"cal_sync"}` | manual sync: phone re-reads the calendar and sends `cal` even if `h` is unchanged |
 
 `hello` additionally accepts an optional `"cal":"<h>"` field: the hash of the calendar the
 watch has cached (omit when it has none).

@@ -69,8 +69,9 @@ final class PhoneLink: NSObject, ObservableObject {
         status = central.state == .poweredOn ? .searching : .off
     }
 
-    // If authenticated, send state{background}; then drop once the outbound queues drain
-    // or after 2 s at the latest. If not authenticated just drop the link.
+    // If authenticated, send state{background}; then drop once inbound data has been quiet
+    // for 2 s (so a calendar transfer in progress can finish), or after 30 s at the latest.
+    // If not authenticated just drop the link.
     func goBackground() {
         appState = "background"
         guard status == .authenticated else {
@@ -78,9 +79,14 @@ final class PhoneLink: NSObject, ObservableObject {
             return
         }
         send(.state("background"))
+        dropWhenQuiet(deadline: Date().addingTimeInterval(30))
+    }
+
+    private func dropWhenQuiet(deadline: Date) {
         after(2) { [weak self] in
-            guard let self, self.appState == "background" else { return }
-            self.disconnect()
+            guard let self, self.appState == "background", self.running else { return }
+            if self.inboundIdle(2) || Date() >= deadline { self.disconnect() }
+            else { self.dropWhenQuiet(deadline: deadline) }
         }
     }
 
@@ -167,7 +173,7 @@ final class PhoneLink: NSObject, ObservableObject {
             AppModel.shared.calendar = cache
             AppModel.shared.store.saveCalendar(cache)
             Task { await CalendarReminders.reschedule(events: cache.events) }
-        case .hello, .state, .ack, .dismiss, .action, .findphone, .media:
+        case .hello, .state, .ack, .dismiss, .action, .findphone, .media, .calSync:
             break
         }
     }
@@ -320,7 +326,9 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
                 if PendingQueue.shared.count == 0, AppModel.shared.sendState == .sending {
                     AppModel.shared.sendState = .sent
                 }
-                if appState == "background", PendingQueue.shared.count == 0 { disconnect(); return }
+                if appState == "background", PendingQueue.shared.count == 0, inboundIdle(2) {
+                    disconnect(); return
+                }
             }
             pumpWrites()
         } else {
@@ -330,6 +338,7 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard error == nil, let data = characteristic.value else { return }
+        lastInboundAt = Date() // per chunk, so a long transfer counts as activity
         guard let sealed = reassembler.push(data) else { return }
         guard let plaintext = try? OpiCrypto.open(sealed, using: PairingKeys.shared.encKey),
               let message = BLEMessage.decode(plaintext) else {
@@ -338,7 +347,6 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
             return
         }
         receivedMessages += 1
-        lastInboundAt = Date()
         handle(message)
     }
 }

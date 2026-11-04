@@ -105,6 +105,7 @@ object Messages {
     data class Action(val id: String, val idx: Int, val label: String, val text: String?) : In
     data class FindPhone(val on: Boolean) : In
     data class MediaCmd(val cmd: String, val v: Float?) : In
+    object CalSync : In
 
     // phone -> watch (outbound for us)
     object Welcome : Out { override fun toJson() = JSONObject().put("type", "welcome") }
@@ -155,6 +156,7 @@ object Messages {
                 cmd = o.getString("cmd"),
                 v = if (o.has("v")) o.getDouble("v").toFloat() else null,
             )
+            "cal_sync" -> CalSync
             else -> null
         }
     }.getOrNull()

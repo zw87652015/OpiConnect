@@ -57,6 +57,11 @@ class MessagesTest {
     }
 
     @Test
+    fun parseCalSync() {
+        assertTrue(Messages.parse("""{"type":"cal_sync"}""".toByteArray()) is Messages.CalSync)
+    }
+
+    @Test
     fun outFindPhoneState() {
         assertTrue(Messages.FindPhoneState(true).toJson().getBoolean("on"))
     }

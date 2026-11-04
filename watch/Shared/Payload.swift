@@ -35,6 +35,7 @@ enum BLEMessage {
     case action(id: String, idx: Int, label: String, text: String?)
     case findphone(on: Bool)
     case media(cmd: String, v: Double? = nil)
+    case calSync                                    // manual calendar resend request
     // phone -> watch
     case welcome
     case notif(NotifPayload)
@@ -63,6 +64,7 @@ enum BLEMessage {
             var o: [String: Any] = ["type": "media", "cmd": cmd]
             if let v { o["v"] = v }
             return o
+        case .calSync: return ["type": "cal_sync"]
         case .welcome: return ["type": "welcome"]
         case .notif(let p):
             var o = p.jsonObject
@@ -105,6 +107,7 @@ enum BLEMessage {
                   let label = o["label"] as? String else { return nil }
             return .action(id: id, idx: idx, label: label, text: o["text"] as? String)
         case "welcome": return .welcome
+        case "cal_sync": return .calSync
         case "notif": return NotifPayload(jsonObject: o).map { .notif($0) }
         case "remove": return (o["id"] as? String).map { .remove(id: $0) }
         case "sync": return (o["ids"] as? [String]).map { .sync(ids: $0) }

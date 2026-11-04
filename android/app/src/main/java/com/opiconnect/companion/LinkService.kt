@@ -85,11 +85,13 @@ class LinkService : Service() {
         var watchState = ""
         var lastCalHash: String? = null   // hash from hello.cal, then last sent
         val reassembler = Reassembler()
-        val messages = ConcurrentLinkedQueue<List<ByteArray>>() // one entry per message (its chunks)
+        val messages = ConcurrentLinkedQueue<Outgoing>() // one entry per message (its chunks)
         @Volatile var chunkIndex = 0
         @Volatile var retries = 0
         @Volatile var sending = false
     }
+
+    class Outgoing(val chunks: List<ByteArray>, val isCal: Boolean)
 
     private val handler = Handler(Looper.getMainLooper())
     private var gattServer: BluetoothGattServer? = null
@@ -249,7 +251,15 @@ class LinkService : Service() {
             if (newState == BluetoothGatt.STATE_CONNECTED) {
                 conns[device.address] = Conn(device)
             } else {
-                conns.remove(device.address)
+                conns.remove(device.address)?.let { conn ->
+                    val head = conn.messages.peek()
+                    if (conn.messages.any { it.isCal }) {
+                        val at = if (head?.isCal == true) " at ${conn.chunkIndex}/${head.chunks.size}" else ""
+                        AppState.setCalendarSent(
+                            "Interrupted$at: watch disconnected — keep the watch app open (${timeNow()})",
+                        )
+                    }
+                }
             }
             updateAppState()
         }
@@ -355,6 +365,7 @@ class LinkService : Service() {
             is Messages.Action -> ActionExecutor.run(msg.id, msg.idx, msg.label, msg.text)
             is Messages.FindPhone -> FindPhone.set(this@LinkService, msg.on)
             is Messages.MediaCmd -> MediaBridge.command(msg.cmd, msg.v)
+            is Messages.CalSync -> sendCalTo(conn, force = true)
             else -> {}
         }
     }
@@ -368,7 +379,7 @@ class LinkService : Service() {
         tx ?: return false
         val sealed = runCatching { Crypto.seal(Messages.encode(msg), keys.encKey) }.getOrNull() ?: return false
         synchronized(conn) {
-            conn.messages.add(Chunker.split(sealed, maxOf(2, conn.mtu - 3)))
+            conn.messages.add(Outgoing(Chunker.split(sealed, maxOf(2, conn.mtu - 3)), msg is Messages.Cal))
         }
         pump(conn)
         return true
@@ -387,23 +398,34 @@ class LinkService : Service() {
         }
     }
 
-    private fun sendCalTo(conn: Conn) {
+    // Manual sync from the phone UI: resend to every connected watch, hash or not.
+    fun resendCal() {
+        val targets = conns.values.filter { it.authenticated }
+        if (targets.isEmpty()) {
+            AppState.setCalendarSent("Not sent: watch not connected — open OpiConnect on the watch")
+            return
+        }
+        targets.forEach { sendCalTo(it, force = true) }
+    }
+
+    private fun sendCalTo(conn: Conn, force: Boolean = false) {
         if (!CalendarSync.hasPermission(this)) {
             AppState.setCalendarSent("Not sent: calendar permission not granted")
             return
         }
         // Rebuild on every hello: the 30-day window moves even when no event changes.
         val msg = CalendarSync.build(this) ?: return
-        if (conn.lastCalHash != msg.h) queueCal(conn, msg)
+        if (force || conn.lastCalHash != msg.h) queueCal(conn, msg)
         else AppState.setCalendarSent("Watch already up to date (${timeNow()})")
     }
 
     private fun queueCal(conn: Conn, msg: com.opiconnect.companion.core.CalMessage) {
+        val kb = (msg.evJson.toByteArray(Charsets.UTF_8).size + 1023) / 1024
         val ok = send(conn, Messages.Cal(msg))
         if (ok) conn.lastCalHash = msg.h
-        val kb = (msg.evJson.length + 1023) / 1024
+        val chunks = conn.messages.lastOrNull { it.isCal }?.chunks?.size ?: 0
         AppState.setCalendarSent(
-            if (ok) "Sent to watch: ~$kb KB (${timeNow()})"
+            if (ok) "Sending to watch: ~$kb KB in $chunks pieces (MTU ${conn.mtu})…"
             else "Send failed: watch not subscribed (${timeNow()})",
         )
     }
@@ -422,9 +444,11 @@ class LinkService : Service() {
         val server = gattServer ?: return
         val tx = tx ?: return
         if (conn.sending) return
-        val chunks = conn.messages.peek() ?: return
+        val out = conn.messages.peek() ?: return
+        val chunks = out.chunks
         if (conn.chunkIndex >= chunks.size) {
             conn.messages.poll()
+            if (out.isCal) AppState.setCalendarSent("Delivered to watch: ${chunks.size} pieces (${timeNow()})")
             conn.chunkIndex = 0
             conn.retries = 0
             return pump(conn)
@@ -452,7 +476,9 @@ class LinkService : Service() {
             val midMessage: Boolean
             synchronized(conn) {
                 midMessage = conn.chunkIndex > 0
-                conn.messages.poll()
+                conn.messages.poll()?.takeIf { it.isCal }?.let {
+                    AppState.setCalendarSent("Failed at piece ${conn.chunkIndex}/${it.chunks.size} (${timeNow()})")
+                }
                 conn.chunkIndex = 0
                 conn.retries = 0
                 conn.sending = false
@@ -469,7 +495,7 @@ class LinkService : Service() {
             synchronized(conn) {
                 val server = gattServer
                 val tx = tx
-                val chunks = conn.messages.peek()
+                val chunks = conn.messages.peek()?.chunks
                 if (server == null || tx == null || chunks == null || conn.chunkIndex >= chunks.size) {
                     conn.sending = false
                     conn.chunkIndex = 0

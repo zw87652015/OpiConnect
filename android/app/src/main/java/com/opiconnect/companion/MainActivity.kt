@@ -279,6 +279,14 @@ fun SetupScreen() {
                             style = MaterialTheme.typography.bodySmall,
                         )
                         calendarSent?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(onClick = {
+                            val link = LinkService.instance
+                            if (link == null) AppState.setCalendarSent("Not sent: background service not running")
+                            else Thread { link.resendCal() }.start()
+                        }) {
+                            Text("Sync calendar to watch now")
+                        }
                     } else {
                         Text(
                             "Powers the watch calendar and on-wrist reminders.",

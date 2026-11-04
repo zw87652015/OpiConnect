@@ -11,3 +11,10 @@ android/.idea/
 *.p8
 _shots/
 node_modules/
+
+android/keystore.properties
+*.jks
+*.keystore
+android/app/release/
+*.aab
+*.apk

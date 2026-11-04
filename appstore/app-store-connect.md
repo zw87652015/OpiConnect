@@ -14,8 +14,12 @@ These are the non-listing fields, with the reasoning behind each answer so you c
 | Secondary category | Productivity |
 | Content rights | No third-party content. The app only shows the user's own notifications. |
 | Price | Free, no in-app purchases (**DECIDE** if otherwise) |
-| Availability | All countries (**DECIDE**; see the France note under Export compliance) |
+| Availability | All countries **except China mainland** (no MIIT/ICP app filing). EU needs a Digital Services Act trader declaration; see below. |
 | watchOS-only | Yes (`WKWatchOnly`), so screenshots are only needed for Apple Watch |
+
+**China mainland:** new apps need an MIIT app filing (ICP) number, which generally requires a Chinese entity or a local partner. Deselect China mainland in Pricing and Availability. The zh-Hans listing still serves Simplified Chinese users in Singapore, Malaysia and elsewhere.
+
+**EU (Digital Services Act):** you must declare in App Store Connect (Business → trader status) whether you're a trader. Selling a paid app generally makes you one, and then your address, phone and email appear publicly on the EU product page. If you don't want that, remove the EU countries.
 
 ## App Privacy (nutrition label)
 
@@ -58,7 +62,7 @@ The usual path for an app like this:
 1. Uses encryption: **Yes**.
 2. Proprietary or non-standard algorithms: **No**, standard algorithms only.
 3. This is typically mass-market (US EAR 5D992.c). Under current US rules, mass-market apps using standard crypto generally don't need an annual self-classification report, and publicly available source code is generally outside the EAR. Confirm this for your situation.
-4. **France:** distributing encryption software in France needs a declaration to ANSSI. Either file it and upload the documentation in App Store Connect, or remove France from availability.
+4. **France:** Apple's [documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption/) requires no documentation when encryption is limited to what the Apple OS provides. The watch binary uses only CryptoKit and HTTPS, so pick that option and no French declaration is needed. A French declaration is only required for standard algorithms implemented outside the OS (for example, a bundled crypto library).
 5. Once settled, set `ITSAppUsesNonExemptEncryption` to match (and `ITSEncryptionExportComplianceCode` if Apple issues one) so TestFlight and App Store uploads stop prompting.
 
 ## Version information

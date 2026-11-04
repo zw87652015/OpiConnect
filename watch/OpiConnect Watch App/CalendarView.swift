@@ -80,7 +80,7 @@ struct CalendarView: View {
                 VStack(spacing: 8) {
                     Text("No upcoming events")
                         .foregroundStyle(.secondary)
-                    Text("Grant OpiConnect calendar access on your phone")
+                    Text("Grant OpiLink calendar access on your phone")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)

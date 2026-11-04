@@ -27,10 +27,10 @@ struct PairingView: View {
                 }
                 .aspectRatio(1, contentMode: .fit)
             }
-            Text("Scan with OpiConnect on your Android phone")
+            Text("Scan with OpiLink on your Android phone")
                 .font(.footnote)
                 .multilineTextAlignment(.center)
-            Text(link.status.rawValue)
+            Text(link.status.label)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }

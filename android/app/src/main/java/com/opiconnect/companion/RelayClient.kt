@@ -40,7 +40,7 @@ object RelayClient {
                             AppState.setRelay("Sent via relay")
                             return
                         }
-                        404 -> AppState.setRelay("Watch not registered yet — open OpiConnect on the watch")
+                        404 -> AppState.setRelay("Watch not registered yet — open OpiLink on the watch")
                         401 -> AppState.setRelay("Relay rejected credentials — re-pair")
                         410 -> AppState.setRelay("Watch push token expired — open the watch app")
                         429 -> AppState.setRelay("Relay rate-limited, will retry later")

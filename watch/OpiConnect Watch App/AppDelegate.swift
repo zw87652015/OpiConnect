@@ -10,6 +10,8 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
     }
 
     func applicationDidFinishLaunching() {
+        // Demo mode: no permission prompts and no APNs registration.
+        guard !DemoMode.isActive else { return }
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         center.requestAuthorization(options: [.alert, .sound]) { _, _ in }

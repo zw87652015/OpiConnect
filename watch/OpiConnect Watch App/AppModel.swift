@@ -40,6 +40,7 @@ final class AppModel: ObservableObject {
         phoneStatus = store.status()
         media = store.media()
         calendar = store.calendar()
+        if DemoMode.isActive { DemoMode.apply(to: self) }
     }
 
     // Deep links: opiconnect://findphone | music | calendar | home
@@ -73,6 +74,7 @@ final class AppModel: ObservableObject {
 
     // Rebuild the list from delivered notifications (parses userInfo["opi"]).
     func reload() {
+        guard !DemoMode.isActive else { return }
         UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
             let items = notifications.compactMap { n -> NotifItem? in
                 guard let dict = n.request.content.userInfo["opi"] as? [String: Any],

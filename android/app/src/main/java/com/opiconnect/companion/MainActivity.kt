@@ -166,7 +166,7 @@ fun SetupScreen() {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text("OpiConnect", style = MaterialTheme.typography.headlineMedium)
+            Text("OpiLink", style = MaterialTheme.typography.headlineMedium)
 
             StepCard(
                 title = "1. Permissions",
@@ -180,8 +180,8 @@ fun SetupScreen() {
             StepCard(
                 title = "2. Notification access",
                 done = listenerEnabled,
-                doneText = if (listenerBound) "OpiConnect can read notifications"
-                    else "Access granted, but the listener isn't running — reopen OpiConnect",
+                doneText = if (listenerBound) "OpiLink can read notifications"
+                    else "Access granted, but the listener isn't running — reopen OpiLink",
                 actionText = "Open settings",
             ) {
                 context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
@@ -207,8 +207,8 @@ fun SetupScreen() {
                     }
                     if (showOppoTips) {
                         Text(
-                            "Settings > Battery > App battery management > OpiConnect > " +
-                                "allow background activity and auto launch. Also lock OpiConnect " +
+                            "Settings > Battery > App battery management > OpiLink > " +
+                                "allow background activity and auto launch. Also lock OpiLink " +
                                 "in Recents so ColorOS doesn't kill it.",
                             style = MaterialTheme.typography.bodySmall,
                         )
@@ -247,7 +247,7 @@ fun SetupScreen() {
                                         LinkService.start(context)
                                     } else {
                                         scope.launch {
-                                            snackbar.showSnackbar("Not an OpiConnect QR code")
+                                            snackbar.showSnackbar("Not an OpiLink QR code")
                                         }
                                     }
                                 }
@@ -338,7 +338,7 @@ fun SetupScreen() {
 
             HorizontalDivider()
             Text(
-                "OpiConnect ${BuildConfig.VERSION_NAME}",
+                "OpiLink ${BuildConfig.VERSION_NAME}",
                 style = MaterialTheme.typography.bodySmall,
             )
         }

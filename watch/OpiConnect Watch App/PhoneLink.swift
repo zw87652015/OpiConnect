@@ -10,6 +10,17 @@ final class PhoneLink: NSObject, ObservableObject {
 
     enum Status: String {
         case off, unauthorized, searching, connecting, connected, authenticated
+
+        // Short user-facing label (rawValue stays for diagnostics).
+        var label: String {
+            switch self {
+            case .off: "Bluetooth off"
+            case .unauthorized: "Bluetooth not allowed"
+            case .searching: "Searching…"
+            case .connecting, .connected: "Connecting…"
+            case .authenticated: "Connected"
+            }
+        }
     }
 
     @Published private(set) var status: Status = .off
@@ -46,10 +57,18 @@ final class PhoneLink: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        central = CBCentralManager(delegate: self, queue: .main)
+        // Demo mode never touches Bluetooth (avoids the permission alert).
+        if !DemoMode.isActive {
+            central = CBCentralManager(delegate: self, queue: .main)
+        }
     }
 
     func start(state: String) {
+        guard !DemoMode.isActive else {
+            status = AppModel.shared.paired ? .authenticated : .searching
+            running = true
+            return
+        }
         appState = state
         running = true
         switch central.state {
@@ -62,6 +81,7 @@ final class PhoneLink: NSObject, ObservableObject {
     }
 
     func disconnect() {
+        guard !DemoMode.isActive else { return }
         running = false
         cancelTimers()
         if let peripheral { central.cancelPeripheralConnection(peripheral) }
@@ -73,6 +93,7 @@ final class PhoneLink: NSObject, ObservableObject {
     // for 2 s (so a calendar transfer in progress can finish), or after 30 s at the latest.
     // If not authenticated just drop the link.
     func goBackground() {
+        guard !DemoMode.isActive else { return }
         appState = "background"
         guard status == .authenticated else {
             disconnect()
@@ -106,7 +127,8 @@ final class PhoneLink: NSObject, ObservableObject {
     }
 
     var canWrite: Bool {
-        status == .authenticated && rx != nil
+        if DemoMode.isActive { return true }
+        return status == .authenticated && rx != nil
     }
 
     // Live messages (hello, state, ack) go out as soon as the RX channel exists, since hello

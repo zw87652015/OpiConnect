@@ -224,7 +224,7 @@ async function push(ip, body) {
   const tag = pairId.slice(0, 6);
   const alert = kind === 'alert';
   const payload = alert
-    ? { aps: { alert: { title: 'OpiConnect', body: 'New notification' }, 'mutable-content': 1, sound: 'default' }, c }
+    ? { aps: { alert: { title: 'OpiLink', body: 'New notification' }, 'mutable-content': 1, sound: 'default' }, c }
     : { aps: { 'content-available': 1 }, c };
   const r = await apnsSend(reg.env, reg.token, alert ? 'alert' : 'background', alert ? 10 : 5, payload, alert ? id : null, alert ? 86400 : 3600);
   if (r.status === 200) {

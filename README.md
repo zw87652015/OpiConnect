@@ -1,6 +1,7 @@
 # OpiConnect
 
-OpiConnect mirrors Android notifications to an Apple Watch. It has three parts:
+OpiConnect mirrors Android notifications to an Apple Watch. It is published on the App
+Store as **OpiLink**. It has three parts:
 
 - a **watch-only watchOS app** (`watch/`) — shows a pairing QR, receives notifications,
   syncs dismissals, runs Android notification actions (including text replies),
@@ -142,5 +143,17 @@ handshake completes — keep the watch app open and near the phone during pairin
 
 ## Licenses
 
-- OpiConnect: GPL-3.0 (`LICENSE`)
+- OpiConnect / OpiLink: [PolyForm Shield 1.0.0](https://polyformproject.org/licenses/shield/1.0.0) (`LICENSE`).
+  The source is available for reading, auditing and building for your own use; you may not
+  use it to provide a product that competes with OpiLink. Commits up to and including
+  `cde6865` were published under GPL-3.0.
 - swift-qrcode-generator: MIT
+
+The OpiLink name and app icon are not covered by the license. Forks must use a different
+name and icon.
+
+## Contributing
+
+By submitting a contribution you agree that it may be distributed under the project's
+current license and any future license the maintainer chooses, including in the paid
+App Store build.

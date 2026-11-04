@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>OpiConnect</string>
+	<string>OpiLink</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>CFBundleExecutable</key>
@@ -34,7 +34,7 @@
 		<string>remote-notification</string>
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>OpiConnect connects to your Android phone over Bluetooth while the app is open.</string>
+	<string>OpiLink connects to your Android phone over Bluetooth while the app is open.</string>
 	<key>OpiRelayURL</key>
 	<string>$(RELAY_URL)</string>
 	<key>OpiAppGroup</key>

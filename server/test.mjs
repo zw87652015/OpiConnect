@@ -154,7 +154,7 @@ test('push alert hits stub with correct path, headers, payload and JWT', async (
   assert.equal(headers['apns-collapse-id'], 'notif1');
   assert.ok(Number(headers['apns-expiration']) > Math.floor(Date.now() / 1000) + 86000);
   assert.deepEqual(JSON.parse(body), {
-    aps: { alert: { title: 'OpiConnect', body: 'New notification' }, 'mutable-content': 1, sound: 'default' },
+    aps: { alert: { title: 'OpiLink', body: 'New notification' }, 'mutable-content': 1, sound: 'default' },
     c,
   });
   const auth = headers['authorization'];

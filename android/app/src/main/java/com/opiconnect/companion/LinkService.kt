@@ -68,7 +68,7 @@ class LinkService : Service() {
                 // ForegroundServiceStartNotAllowedException (background start) or
                 // IllegalStateException — the listener must never crash here.
                 Log.w(TAG, "couldn't start service: $e")
-                AppState.setError("Couldn't start background service — open OpiConnect")
+                AppState.setError("Couldn't start background service — open OpiLink")
             }
         }
 
@@ -167,7 +167,7 @@ class LinkService : Service() {
         )
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setContentTitle("OpiConnect is running")
+            .setContentTitle("OpiLink is running")
             .setContentText(linkStatusText())
             .setContentIntent(pi)
             .setOngoing(true)
@@ -181,7 +181,7 @@ class LinkService : Service() {
     private fun updateNotification() {
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setContentTitle("OpiConnect is running")
+            .setContentTitle("OpiLink is running")
             .setContentText(linkStatusText())
             .setOngoing(true)
             .build()
@@ -403,7 +403,7 @@ class LinkService : Service() {
     fun resendCal() {
         val targets = conns.values.filter { it.authenticated }
         if (targets.isEmpty()) {
-            AppState.setCalendarSent("Not sent: watch not connected — open OpiConnect on the watch")
+            AppState.setCalendarSent("Not sent: watch not connected — open OpiLink on the watch")
             return
         }
         targets.forEach { sendCalTo(it, force = true) }

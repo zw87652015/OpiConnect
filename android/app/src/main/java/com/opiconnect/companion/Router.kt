@@ -90,7 +90,7 @@ object Router {
         val payload = NotifPayload(
             i = Crypto.notifId("opi-test-" + System.currentTimeMillis()),
             p = "com.opiconnect.test",
-            a = "OpiConnect",
+            a = "OpiLink",
             t = "Test",
             b = "Hello from Android — 你好",
             w = System.currentTimeMillis(),

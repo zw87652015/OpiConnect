@@ -6,10 +6,11 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $model.path) {
+            ScrollViewReader { proxy in
             List {
                 Section {
                     HStack {
-                        Label(link.status.rawValue, systemImage: "iphone")
+                        Label(link.status.label, systemImage: "iphone")
                             .font(.caption)
                         Spacer()
                         if let s = model.phoneStatus {
@@ -46,10 +47,18 @@ struct HomeView: View {
                                 Text(item.payload.b).font(.caption).lineLimit(2)
                             }
                         }
+                        .id(item.id)
                     }
                 }
             }
-            .navigationTitle("OpiConnect")
+            .onAppear {
+                if DemoMode.isActive && DemoMode.route == "home",
+                   model.items.count > 2 {
+                    proxy.scrollTo(model.items[1].id, anchor: .center)
+                }
+            }
+            }
+            .navigationTitle("OpiLink")
             .navigationDestination(for: AppModel.Route.self) { route in
                 switch route {
                 case .detail(let id):

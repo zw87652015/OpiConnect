@@ -301,7 +301,7 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
         }
         // Channel is up: authenticate (echo cached calendar hash so the phone only
         // resends the calendar when it changed).
-        send(.hello(state: appState, cal: AppModel.shared.calendar?.h))
+        send(.hello(state: appState, cal: AppModel.shared.calendar.flatMap { $0.events.isEmpty ? nil : $0.h }))
         after(5) { [weak self] in
             guard let self, self.status != .authenticated else { return }
             self.dropPeripheral(reject: true)
@@ -334,6 +334,7 @@ extension PhoneLink: @preconcurrency CBPeripheralDelegate {
         guard let plaintext = try? OpiCrypto.open(sealed, using: PairingKeys.shared.encKey),
               let message = BLEMessage.decode(plaintext) else {
             droppedMessages += 1
+            reassembler.reset()
             return
         }
         receivedMessages += 1

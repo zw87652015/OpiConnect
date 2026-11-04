@@ -449,12 +449,19 @@ class LinkService : Service() {
     private fun onChunkFailed(conn: Conn) {
         conn.retries++
         if (conn.retries >= 3) {
+            val midMessage: Boolean
             synchronized(conn) {
+                midMessage = conn.chunkIndex > 0
                 conn.messages.poll()
                 conn.chunkIndex = 0
                 conn.retries = 0
                 conn.sending = false
+                conn.lastCalHash = null
             }
+            // A mid-message drop leaves partial chunks in the watch's
+            // reassembler; dropping the link resets both sides.
+            if (midMessage) runCatching { gattServer?.cancelConnection(conn.device) }
+            CalendarSync.schedule()
             pump(conn)
             return
         }

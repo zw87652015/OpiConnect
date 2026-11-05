@@ -82,4 +82,4 @@ Same as en-US (the URL fields are per-localization, so enter them again):
 ## Screenshots (422 × 514, from `appstore/screenshots/zh-Hans/`)
 
 Same order and screens as en-US, with Chinese demo content (`-OpiDemo zh`, zh-Hans locale):
-01-home, 02-detail, 03-otp, 04-calendar, 05-music, 06-findphone, 07-pairing.
+00-home, 01-notifications, 02-detail, 03-otp, 04-calendar, 05-music, 06-findphone, 07-pairing.

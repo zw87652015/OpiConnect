@@ -13,11 +13,11 @@ struct HomeView: View {
                     HStack {
                         Label(link.status.label, systemImage: "iphone")
                             .font(.caption)
-                        Spacer()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        Spacer(minLength: 4)
                         if let s = model.phoneStatus {
-                            Label("\(s.bt)%", systemImage: s.bc ? "battery.100.bolt" : "battery.50")
-                                .font(.caption)
-                                .foregroundStyle(s.bc ? .green : .secondary)
+                            BatteryRing(level: s.bt, charging: s.bc)
                         }
                         Image(systemName: model.relayRegistered ? "checkmark.icloud" : "exclamationmark.icloud")
                             .foregroundStyle(model.relayRegistered ? .green : .orange)
@@ -59,7 +59,7 @@ struct HomeView: View {
                 }
             }
             .onAppear {
-                if DemoMode.isActive && DemoMode.route == "home",
+                if DemoMode.isActive && DemoMode.route == "notifications",
                    model.items.count > 2 {
                     proxy.scrollTo(model.items[1].id, anchor: .center)
                 }
@@ -98,5 +98,31 @@ struct HomeView: View {
                 }
             }
         }
+    }
+}
+
+// Phone battery: ring filled to the level, percentage inside; green while charging.
+private struct BatteryRing: View {
+    let level: Int
+    let charging: Bool
+
+    private var color: Color {
+        charging ? .green : level <= 20 ? .red : .white
+    }
+
+    var body: some View {
+        ZStack {
+            Circle().stroke(.white.opacity(0.2), lineWidth: 2)
+            Circle()
+                .trim(from: 0, to: CGFloat(min(max(level, 0), 100)) / 100)
+                .stroke(color, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            Text(verbatim: "\(level)%")
+                .font(.system(size: 7, weight: .semibold).monospacedDigit())
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+                .padding(.horizontal, 2)
+        }
+        .frame(width: 24, height: 24)
     }
 }

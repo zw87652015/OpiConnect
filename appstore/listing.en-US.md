@@ -90,13 +90,14 @@ Upload in this order from `appstore/screenshots/en-US/`:
 
 | # | File | What it shows |
 | --- | --- | --- |
-| 1 | 01-home.png | Notification list, with a one-time code highlighted |
-| 2 | 02-detail.png | A message with Reply and Mark as read |
-| 3 | 03-otp.png | One-time code shown in large type |
-| 4 | 04-calendar.png | Upcoming events synced from the phone |
-| 5 | 05-music.png | Now Playing controls |
-| 6 | 06-findphone.png | Find My Phone |
-| 7 | 07-pairing.png | QR pairing screen |
+| 1 | 00-home.png | Home: phone status, Find Phone, Now Playing, Calendar |
+| 2 | 01-notifications.png | Notification list, with a one-time code highlighted |
+| 3 | 02-detail.png | A message with Reply and Mark as read |
+| 4 | 03-otp.png | One-time code shown in large type |
+| 5 | 04-calendar.png | Upcoming events synced from the phone |
+| 6 | 05-music.png | Now Playing controls |
+| 7 | 06-findphone.png | Find My Phone |
+| 8 | 07-pairing.png | QR pairing screen |
 
 Screenshots are captured from the Debug build's demo mode (`-OpiDemo en`), which uses made-up content.
 

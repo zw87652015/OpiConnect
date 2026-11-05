@@ -167,7 +167,7 @@ def make_header(locale, heading, subline):
     zh = locale == "zh-Hans"
 
     # two watches side by side in the right ~52%, no overlap
-    left_w, lox, loy, lbw, lbh = watch_mockup(shot_path(locale, "01-home.png"), 2.0)
+    left_w, lox, loy, lbw, lbh = watch_mockup(shot_path(locale, "01-notifications.png"), 2.0)
     right_w, rox, roy, rbw, rbh = watch_mockup(shot_path(locale, "03-otp.png"), 2.0)
     gap = 110
     group_w = lbw + gap + rbw
@@ -228,7 +228,7 @@ def make_search(locale, heading, subline):
     # three watches, no overlap: ~140px gap between bodies, >=180px side margins
     scale = 2.2
     gap = 140
-    names = ["01-home.png", "02-detail.png", "03-otp.png"]
+    names = ["01-notifications.png", "02-detail.png", "03-otp.png"]
     watches = [watch_mockup(shot_path(locale, n), scale) for n in names]
     bw = watches[0][3]
     total = 3 * bw + 2 * gap

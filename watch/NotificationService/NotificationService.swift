@@ -11,7 +11,7 @@ final class NotificationService: UNNotificationServiceExtension {
         handler = contentHandler
         bestAttempt = request.content.mutableCopy() as? UNMutableNotificationContent
 
-        Task {
+        Task { @MainActor in
             defer { finish() }
             guard let c = request.content.userInfo["c"] as? String,
                   let sealed = OpiCrypto.base64urlDecode(c),
@@ -23,8 +23,14 @@ final class NotificationService: UNNotificationServiceExtension {
             if let bt = payload.bt {
                 SharedStore().saveStatus(PhoneStatus(bt: bt, bc: payload.bc ?? false, at: Date()))
             }
-            await Categories.ensureRegistered(for: payload)
             bestAttempt = NotificationContent.make(for: payload)
+            // Category registration can stall in the extension; never let it hold back the
+            // decrypted content (worst case the alert shows without action buttons).
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(3))
+                self.finish()
+            }
+            await Categories.ensureRegistered(for: payload)
         }
     }
 

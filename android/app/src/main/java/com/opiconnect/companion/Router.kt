@@ -37,7 +37,23 @@ object Router {
 
     fun onPosted(sbn: StatusBarNotification) {
         val context = OpiListenerService.instance ?: return
-        if (!Calls.isRinging(sbn.notification) && ForwardPrefs.screenOffOnly(context) &&
+        val n = sbn.notification
+        if (n.category == Notification.CATEGORY_CALL ||
+            Calls.isCallPackage(context, sbn.packageName) ||
+            n.fullScreenIntent != null
+        ) {
+            val e = n.extras
+            Log.i(TAG, "call? pkg=${sbn.packageName} cat=${n.category} ongoing=${sbn.isOngoing} " +
+                "fgs=${n.flags and Notification.FLAG_FOREGROUND_SERVICE != 0} " +
+                "fsi=${n.fullScreenIntent != null} " +
+                "callType=${runCatching { e.getInt("android.callType", -1) }.getOrDefault(-1)} " +
+                "answer=${e.containsKey(Notification.EXTRA_ANSWER_INTENT)} " +
+                "actions=${n.actions?.size ?: 0} " +
+                "titleEmpty=${e.getCharSequence(Notification.EXTRA_TITLE).isNullOrEmpty()} " +
+                "textEmpty=${e.getCharSequence(Notification.EXTRA_TEXT).isNullOrEmpty()} " +
+                "ringing=${Calls.isRinging(context, sbn)}")
+        }
+        if (!Calls.isRinging(context, sbn) && ForwardPrefs.screenOffOnly(context) &&
             context.getSystemService(PowerManager::class.java)?.isInteractive == true
         ) return
         val payload = buildPayload(context, sbn) ?: run {
@@ -158,7 +174,7 @@ object Router {
         if (sbn.packageName == context?.packageName) return false
         if (context != null && !ForwardPrefs.allows(context, sbn.packageName)) return false
         // Ringing calls are ongoing/foreground-service and often have no title/text.
-        val ringing = Calls.isRinging(sbn.notification)
+        val ringing = Calls.isRinging(context, sbn)
         if (!ringing && sbn.isOngoing) return false
         // Calendar apps: when watch reminders are active, their notifications would duplicate.
         if (context != null && CalendarSync.hasPermission(context) &&
@@ -169,6 +185,11 @@ object Router {
         if (!ringing && flags and Notification.FLAG_FOREGROUND_SERVICE != 0) return false
         if (!ringing) {
             val e = sbn.notification.extras
+            // In-progress bars (downloads, uploads) update many times a second; only the final post matters.
+            val max = e.getInt(Notification.EXTRA_PROGRESS_MAX)
+            if (e.getBoolean(Notification.EXTRA_PROGRESS_INDETERMINATE) ||
+                (max > 0 && e.getInt(Notification.EXTRA_PROGRESS) < max)
+            ) return false
             val title = e.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
             val text = e.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
             if (title.isEmpty() && text.isEmpty()) return false
@@ -177,14 +198,14 @@ object Router {
     }
 
     fun actionsOf(context: Context, sbn: StatusBarNotification): List<Notification.Action> =
-        if (Calls.isRinging(sbn.notification)) Calls.actions(context, sbn.notification)
+        if (Calls.isRinging(context, sbn)) Calls.actions(context, sbn.notification)
         else sbn.notification.actions.orEmpty().asList()
 
     private fun buildPayload(context: Context, sbn: StatusBarNotification): NotifPayload? {
         if (!passesFilter(sbn)) return null
         val n = sbn.notification
         val e = n.extras
-        val ringing = Calls.isRinging(n)
+        val ringing = Calls.isRinging(context, sbn)
         var title = e.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
         if (ringing && title.isEmpty()) title = Calls.caller(n).orEmpty()
         var body = e.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()

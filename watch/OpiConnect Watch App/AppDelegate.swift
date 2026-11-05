@@ -73,13 +73,16 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
 extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        [.banner, .sound, .list]
+        if notification.request.content.userInfo["q"] as? Bool == true { return [.list] }
+        return [.banner, .sound, .list]
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse) async {
         let id = response.notification.request.identifier
         let actionId = response.actionIdentifier
+        let payload = (response.notification.request.content.userInfo["opi"] as? [String: Any])
+            .flatMap(NotifPayload.init(jsonObject:))
         if actionId == UNNotificationDismissActionIdentifier {
             PendingQueue.shared.enqueue(.dismiss(id: id))
             AppModel.shared.remove(id: id)
@@ -88,13 +91,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
         if actionId.hasPrefix("act.") {
             guard let idx = Int(actionId.dropFirst(4)),
-                  let dict = response.notification.request.content.userInfo["opi"] as? [String: Any],
-                  let payload = NotifPayload(jsonObject: dict),
+                  let payload,
                   let action = payload.x?[safe: idx] else { return }
             let text = (response as? UNTextInputNotificationResponse)?.userText
             PendingQueue.shared.enqueue(.action(id: payload.i, idx: idx, label: action.l, text: text))
             // Actions are .foreground, so the app is about to become active: connect and send.
             AppModel.shared.sendState = .sending
+            AppModel.shared.insert(payload)
+            AppModel.shared.openNotification(id: payload.i)
             PhoneLink.shared.start(state: "active")
             PhoneLink.shared.flush()
             Task { @MainActor in
@@ -103,8 +107,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             }
             return
         }
-        // Default tap: open the detail view.
-        AppModel.shared.openNotification(id: id)
+        // Default tap: keep the notification and open the detail view.
+        if let payload {
+            AppModel.shared.insert(payload)
+            AppModel.shared.openNotification(id: payload.i)
+            await Categories.ensureRegistered(for: payload)
+            let delivered = await center.deliveredNotifications()
+            if !delivered.contains(where: { $0.request.identifier == payload.i }) {
+                let request = UNNotificationRequest(identifier: payload.i,
+                                                    content: NotificationContent.make(for: payload, quiet: true),
+                                                    trigger: nil)
+                try? await center.add(request)
+            }
+        } else {
+            AppModel.shared.openNotification(id: id)
+        }
     }
 }
 

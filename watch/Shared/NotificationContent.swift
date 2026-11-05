@@ -3,7 +3,7 @@ import UserNotifications
 
 // Shared by the NSE (APNs path) and the app (BLE path) so both build identical content.
 enum NotificationContent {
-    static func make(for payload: NotifPayload) -> UNMutableNotificationContent {
+    static func make(for payload: NotifPayload, quiet: Bool = false) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         if let code = OTPDetector.detect(in: payload) {
             content.title = "Code " + OTPDetector.display(code)
@@ -14,9 +14,9 @@ enum NotificationContent {
         }
         content.body = payload.b
         content.threadIdentifier = payload.p
-        content.sound = .default
+        content.sound = quiet ? nil : .default
         content.categoryIdentifier = Categories.categoryId(for: payload)
-        content.userInfo = ["opi": payload.jsonObject]
+        content.userInfo = quiet ? ["opi": payload.jsonObject, "q": true] : ["opi": payload.jsonObject]
         return content
     }
 }

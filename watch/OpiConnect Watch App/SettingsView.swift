@@ -31,6 +31,7 @@ struct SettingsView: View {
                 LabeledContent("Calendar", value: calendarText)
                 LabeledContent("BLE received", value: "\(link.receivedMessages)")
                 LabeledContent("BLE dropped", value: "\(link.droppedMessages)")
+                LabeledContent("Queued", value: "\(PendingQueue.shared.count)")
             }
             Section {
                 Button("Unpair", role: .destructive) { confirmUnpair = true }

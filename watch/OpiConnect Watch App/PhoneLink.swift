@@ -69,15 +69,23 @@ final class PhoneLink: NSObject, ObservableObject {
             running = true
             return
         }
+        let previousState = appState
         appState = state
         running = true
+        if status == .authenticated, previousState != state { send(.state(state)) }
         switch central.state {
         case .poweredOn:
-            if peripheral == nil { beginScan() }
+            if let peripheral, peripheral.state != .connected, peripheral.state != .connecting {
+                cleanupConnection()
+                beginScan()
+            } else if peripheral == nil {
+                beginScan()
+            }
         case .unauthorized: status = .unauthorized
         case .poweredOff: status = .off
         default: break
         }
+        flush()
     }
 
     func disconnect() {
@@ -96,7 +104,11 @@ final class PhoneLink: NSObject, ObservableObject {
         guard !DemoMode.isActive else { return }
         appState = "background"
         guard status == .authenticated else {
-            disconnect()
+            if PendingQueue.shared.count == 0 {
+                disconnect()
+            } else {
+                dropWhenQuiet(deadline: Date().addingTimeInterval(30))
+            }
             return
         }
         send(.state("background"))
@@ -106,7 +118,7 @@ final class PhoneLink: NSObject, ObservableObject {
     private func dropWhenQuiet(deadline: Date) {
         after(2) { [weak self] in
             guard let self, self.appState == "background", self.running else { return }
-            if self.inboundIdle(2) || Date() >= deadline { self.disconnect() }
+            if (self.inboundIdle(2) && PendingQueue.shared.count == 0) || Date() >= deadline { self.disconnect() }
             else { self.dropWhenQuiet(deadline: deadline) }
         }
     }
@@ -166,7 +178,10 @@ final class PhoneLink: NSObject, ObservableObject {
             status = .authenticated
             UserDefaults.appGroup.set(true, forKey: "opi.paired")
             AppModel.shared.paired = true
-            if AppModel.shared.sendState == .sending { AppModel.shared.sendState = .sent }
+            if AppModel.shared.sendState == .sending, PendingQueue.shared.count == 0 {
+                AppModel.shared.sendState = .sent
+            }
+            if appState == "background" { dropWhenQuiet(deadline: Date().addingTimeInterval(30)) }
             flush()
         case .notif(let payload):
             Task {
@@ -294,7 +309,7 @@ extension PhoneLink: @preconcurrency CBCentralManagerDelegate {
         cleanupConnection()
         guard running else { status = .searching; return }
         status = .searching
-        if appState == "active" {
+        if appState == "active" || PendingQueue.shared.count > 0 {
             after(2) { [weak self] in
                 guard let self, self.running, self.peripheral == nil else { return }
                 self.beginScan()

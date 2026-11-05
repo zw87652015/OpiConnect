@@ -130,4 +130,20 @@ final class FeatureTests: XCTestCase {
         store.saveMedia(media)
         XCTAssertEqual(store.media(), media)
     }
+
+    // MARK: NotificationContent
+
+    func testNotificationContentQuiet() throws {
+        let payload = NotifPayload(i: "n1", p: "com.app", a: "App", t: "Title", b: "Body",
+                                   w: 1000, x: nil, bt: nil, bc: nil)
+        let quiet = NotificationContent.make(for: payload, quiet: true)
+        XCTAssertNil(quiet.sound)
+        XCTAssertEqual(quiet.userInfo["q"] as? Bool, true)
+        let dict = try XCTUnwrap(quiet.userInfo["opi"] as? [String: Any])
+        XCTAssertEqual(NotifPayload(jsonObject: dict), payload)
+
+        let loud = NotificationContent.make(for: payload)
+        XCTAssertNotNil(loud.sound)
+        XCTAssertNil(loud.userInfo["q"])
+    }
 }

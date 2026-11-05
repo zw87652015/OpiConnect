@@ -81,9 +81,14 @@ final class AppModel: ObservableObject {
                       let payload = NotifPayload(jsonObject: dict) else { return nil }
                 return NotifItem(payload: payload)
             }
-            .sorted { $0.payload.w > $1.payload.w }
             Task { @MainActor in
-                self.items = items
+                var items = items
+                if case .detail(let id) = self.path.last,
+                   !items.contains(where: { $0.id == id }),
+                   let current = self.items.first(where: { $0.id == id }) {
+                    items.append(current)
+                }
+                self.items = items.sorted { $0.payload.w > $1.payload.w }
             }
         }
     }

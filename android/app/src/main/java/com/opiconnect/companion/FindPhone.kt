@@ -11,6 +11,7 @@ import android.media.AudioManager
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.media.ToneGenerator
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.VibrationAttributes
@@ -72,10 +73,14 @@ object FindPhone {
         }
         val sound = attempt("sound") { startSound(app) } == true
         val vibration = attempt("vibration") {
-            app.getSystemService(VibratorManager::class.java).defaultVibrator.vibrate(
-                VibrationEffect.createWaveform(longArrayOf(0, 500, 300, 500), 0),
-                VibrationAttributes.createForUsage(VibrationAttributes.USAGE_ALARM),
-            )
+            val vibrator = app.getSystemService(VibratorManager::class.java).defaultVibrator
+            val effect = VibrationEffect.createWaveform(longArrayOf(0, 500, 300, 500), 0)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                vibrator.vibrate(effect, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_ALARM))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(effect, AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
+            }
             vibrating = true
             true
         } == true

@@ -2,7 +2,6 @@ package com.opiconnect.companion
 
 import android.app.Notification
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.PowerManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -209,7 +208,7 @@ object Router {
         labels.getOrPut(pkg) {
             runCatching {
                 context.packageManager.getApplicationLabel(
-                    context.packageManager.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0)),
+                    context.packageManager.getApplicationInfo(pkg, 0),
                 ).toString()
             }.getOrDefault(pkg)
         }

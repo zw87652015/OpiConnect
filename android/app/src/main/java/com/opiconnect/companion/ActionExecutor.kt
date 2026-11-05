@@ -4,6 +4,7 @@ import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.app.RemoteInput
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -41,9 +42,11 @@ object ActionExecutor {
             AppState.setError(service.getString(R.string.error_action_gone))
             return
         }
-        val options = ActivityOptions.makeBasic()
-            .setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
-            .toBundle()
+        val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ActivityOptions.makeBasic()
+                .setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
+                .toBundle()
+        } else null
         try {
             val remoteInputs = action.remoteInputs
             if (text != null && !remoteInputs.isNullOrEmpty()) {

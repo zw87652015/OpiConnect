@@ -26,6 +26,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Binder
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
@@ -462,12 +463,18 @@ class LinkService : Service() {
     }
 
     // Must be called under synchronized(conn).
+    @Suppress("DEPRECATION")
     private fun notifyChunk(
         conn: Conn, server: BluetoothGattServer,
         tx: BluetoothGattCharacteristic, chunk: ByteArray,
     ) {
-        val status = server.notifyCharacteristicChanged(conn.device, tx, true, chunk)
-        if (status != BluetoothStatusCodes.SUCCESS) {
+        val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            server.notifyCharacteristicChanged(conn.device, tx, true, chunk) == BluetoothStatusCodes.SUCCESS
+        } else {
+            tx.value = chunk
+            server.notifyCharacteristicChanged(conn.device, tx, true)
+        }
+        if (!ok) {
             onChunkFailed(conn)
         }
     }

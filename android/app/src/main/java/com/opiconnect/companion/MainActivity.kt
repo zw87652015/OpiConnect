@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -88,11 +89,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private val BLE_PERMISSIONS = arrayOf(
+private val BLE_PERMISSIONS = listOfNotNull(
     Manifest.permission.BLUETOOTH_ADVERTISE,
     Manifest.permission.BLUETOOTH_CONNECT,
-    Manifest.permission.POST_NOTIFICATIONS,
-)
+    Manifest.permission.POST_NOTIFICATIONS.takeIf { Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU },
+).toTypedArray()
 
 @Composable
 fun SetupScreen() {
@@ -205,7 +206,7 @@ fun SetupScreen() {
         ) {
             Text("OpiLink", style = MaterialTheme.typography.headlineMedium)
 
-            TextButton(onClick = { showLanguagePicker = true }) {
+            if (AppLanguage.supported) TextButton(onClick = { showLanguagePicker = true }) {
                 Text(
                     stringResource(R.string.language) + ": " +
                         AppLanguage.options.firstOrNull { it.tag == language }
@@ -632,13 +633,12 @@ private fun AppPickerDialog(onDismiss: () -> Unit) {
         entries = withContext(Dispatchers.IO) {
             val pm = context.packageManager
             val launchable = pm.queryIntentActivities(
-                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
-                PackageManager.ResolveInfoFlags.of(0),
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0,
             ).map { it.loadLabel(pm).toString() to it.activityInfo.packageName }
             val extra = ForwardPrefs.apps(context).map { pkg ->
                 runCatching {
                     pm.getApplicationLabel(
-                        pm.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0)),
+                        pm.getApplicationInfo(pkg, 0),
                     ).toString()
                 }.getOrDefault(pkg) to pkg
             }

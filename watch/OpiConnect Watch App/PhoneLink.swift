@@ -14,11 +14,11 @@ final class PhoneLink: NSObject, ObservableObject {
         // Short user-facing label (rawValue stays for diagnostics).
         var label: String {
             switch self {
-            case .off: "Bluetooth off"
-            case .unauthorized: "Bluetooth not allowed"
-            case .searching: "Searching…"
-            case .connecting, .connected: "Connecting…"
-            case .authenticated: "Connected"
+            case .off: String(localized: "Bluetooth off")
+            case .unauthorized: String(localized: "Bluetooth not allowed")
+            case .searching: String(localized: "Searching…")
+            case .connecting, .connected: String(localized: "Connecting…")
+            case .authenticated: String(localized: "Connected")
             }
         }
     }

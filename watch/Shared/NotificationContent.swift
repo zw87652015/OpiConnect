@@ -6,7 +6,7 @@ enum NotificationContent {
     static func make(for payload: NotifPayload, quiet: Bool = false) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         if let code = OTPDetector.detect(in: payload) {
-            content.title = "Code " + OTPDetector.display(code)
+            content.title = String(localized: "Code \(OTPDetector.display(code))", table: "Shared")
             content.subtitle = payload.t.isEmpty ? payload.a : "\(payload.a) · \(payload.t)"
         } else {
             content.title = payload.a

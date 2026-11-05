@@ -40,8 +40,8 @@ struct CalendarView: View {
         fmt.setLocalizedDateFormatFromTemplate("EEEE d MMM")
         return order.sorted().map { day in
             let title: String
-            if cal.isDateInToday(day) { title = "Today" }
-            else if cal.isDateInTomorrow(day) { title = "Tomorrow" }
+            if cal.isDateInToday(day) { title = String(localized: "Today") }
+            else if cal.isDateInTomorrow(day) { title = String(localized: "Tomorrow") }
             else { title = fmt.string(from: day) }
             return (title, map[day] ?? [])
         }
@@ -60,9 +60,9 @@ struct CalendarView: View {
                                             .fill(color(for: event))
                                             .frame(width: 8, height: 8)
                                         VStack(alignment: .leading, spacing: 1) {
-                                            Text(event.t.isEmpty ? "(No title)" : event.t)
+                                            Text(event.t.isEmpty ? String(localized: "(No title)") : event.t)
                                                 .font(.callout).lineLimit(1)
-                                            Text(event.ad ? "All day" : timeRange(event))
+                                            Text(event.ad ? String(localized: "All day") : timeRange(event))
                                                 .font(.caption2).foregroundStyle(.secondary)
                                         }
                                     }
@@ -118,8 +118,8 @@ struct EventDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
-                Text(event.t.isEmpty ? "(No title)" : event.t).font(.headline)
-                Text(event.ad ? "All day" : "\(dateStr(event.startDate)) \(timeStr(event.startDate))–\(timeStr(event.endDate))")
+                Text(event.t.isEmpty ? String(localized: "(No title)") : event.t).font(.headline)
+                Text(event.ad ? String(localized: "All day") : "\(dateStr(event.startDate)) \(timeStr(event.startDate))–\(timeStr(event.endDate))")
                     .font(.caption).foregroundStyle(.secondary)
                 if !event.loc.isEmpty {
                     Label(event.loc, systemImage: "mappin").font(.caption)

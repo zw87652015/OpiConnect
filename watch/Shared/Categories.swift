@@ -20,7 +20,7 @@ enum Categories {
             let identifier = "act.\(idx)"
             return action.r
                 ? UNTextInputNotificationAction(identifier: identifier, title: action.l,
-                                                options: [.foreground], textInputButtonTitle: "Send",
+                                                options: [.foreground], textInputButtonTitle: String(localized: "Send", table: "Shared"),
                                                 textInputPlaceholder: "")
                 : UNNotificationAction(identifier: identifier, title: action.l, options: [.foreground])
         }

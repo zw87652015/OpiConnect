@@ -6,9 +6,9 @@ struct SettingsView: View {
     @StateObject private var link = PhoneLink.shared
 
     private var calendarText: String {
-        guard let cal = model.calendar else { return "never received" }
+        guard let cal = model.calendar else { return String(localized: "Never received") }
         let ago = RelativeDateTimeFormatter().localizedString(for: cal.updatedAt, relativeTo: Date())
-        return "\(cal.events.count) events · \(ago)"
+        return String(localized: "\(cal.events.count) events · \(ago)")
     }
 
     private var relayURL: String {

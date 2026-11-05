@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var model: AppModel
     @StateObject private var link = PhoneLink.shared
+    @State private var confirmDismissAll = false
 
     var body: some View {
         NavigationStack(path: $model.path) {
@@ -49,6 +50,12 @@ struct HomeView: View {
                         }
                         .id(item.id)
                     }
+                    if !model.items.isEmpty {
+                        Button(role: .destructive) { confirmDismissAll = true } label: {
+                            Label("Dismiss All", systemImage: "xmark.circle")
+                        }
+                        .id("opi.dismissAll")
+                    }
                 }
             }
             .onAppear {
@@ -56,9 +63,16 @@ struct HomeView: View {
                    model.items.count > 2 {
                     proxy.scrollTo(model.items[1].id, anchor: .center)
                 }
+                if DemoMode.isActive && DemoMode.route == "bottom" {
+                    proxy.scrollTo("opi.dismissAll", anchor: .bottom)
+                }
             }
             }
             .navigationTitle("OpiLink")
+            .confirmationDialog("Dismiss all notifications?", isPresented: $confirmDismissAll) {
+                Button("Dismiss All", role: .destructive) { model.dismissAll() }
+                Button("Cancel", role: .cancel) {}
+            }
             .navigationDestination(for: AppModel.Route.self) { route in
                 switch route {
                 case .detail(let id):
@@ -71,6 +85,7 @@ struct HomeView: View {
                 case .findphone: FindPhoneView()
                 case .music: NowPlayingView()
                 case .calendar: CalendarView()
+                case .settings: SettingsView()
                 }
             }
             .toolbar {

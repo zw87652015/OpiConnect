@@ -34,6 +34,7 @@ final class AppModel: ObservableObject {
         case findphone
         case music
         case calendar
+        case settings
     }
 
     private init() {
@@ -72,6 +73,17 @@ final class AppModel: ObservableObject {
 
     func remove(id: String) {
         items.removeAll { $0.id == id }
+    }
+
+    func dismiss(ids: [String]) {
+        for id in ids { PendingQueue.shared.enqueue(.dismiss(id: id)) }
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
+        items.removeAll { ids.contains($0.id) }
+        PhoneLink.shared.flush()
+    }
+
+    func dismissAll() {
+        dismiss(ids: items.map(\.id))
     }
 
     func sync(ids: Set<String>) {

@@ -92,7 +92,7 @@ enum DemoMode {
         model.phoneStatus = PhoneStatus(bt: 82, bc: false, at: Date())
         model.media = media
         model.calendar = calendar
-        if route == "pairing" {
+        if route == "pairing" || route == "guide" {
             model.paired = false
             return
         }
@@ -108,6 +108,8 @@ enum DemoMode {
             model.path = [.music]
         case "findphone":
             model.path = [.findphone]
+        case "settings":
+            model.path = [.settings]
         default:
             model.path = []
         }

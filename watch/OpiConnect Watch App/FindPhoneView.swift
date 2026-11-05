@@ -24,7 +24,7 @@ struct FindPhoneView: View {
             }
             .buttonStyle(.borderless)
             .disabled(!connected)
-            Text(model.ringing ? "Phone is ringing" : "Ring your phone")
+            Text(model.ringing ? String(localized: "Phone is ringing") : String(localized: "Ring your phone"))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

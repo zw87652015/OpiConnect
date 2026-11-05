@@ -14,7 +14,7 @@ struct NowPlayingView: View {
                 if !m.app.isEmpty {
                     Text(m.app).font(.caption2).foregroundStyle(.secondary)
                 }
-                Text(m.t.isEmpty ? "Unknown track" : m.t)
+                Text(m.t.isEmpty ? String(localized: "Unknown track") : m.t)
                     .font(.headline)
                     .lineLimit(2)
                 if !m.ar.isEmpty {

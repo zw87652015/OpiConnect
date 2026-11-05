@@ -68,9 +68,6 @@ struct DetailView: View {
     }
 
     private func dismiss() {
-        PendingQueue.shared.enqueue(.dismiss(id: payload.i))
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [payload.i])
-        model.remove(id: payload.i)
-        PhoneLink.shared.flush()
+        model.dismiss(ids: [payload.i])
     }
 }

@@ -54,9 +54,9 @@ enum CalendarReminders {
         if !stale.isEmpty { center.removePendingNotificationRequests(withIdentifiers: stale) }
         for fire in select(from: events, now: now, timeZone: timeZone) {
             let content = UNMutableNotificationContent()
-            content.title = fire.event.t.isEmpty ? "Event" : fire.event.t
+            content.title = fire.event.t.isEmpty ? String(localized: "Event", table: "Shared") : fire.event.t
             var body = fire.event.ad
-                ? "All day"
+                ? String(localized: "All day", table: "Shared")
                 : Self.timeRange(event: fire.event, timeZone: timeZone)
             if !fire.event.loc.isEmpty { body += " · \(fire.event.loc)" }
             content.body = body

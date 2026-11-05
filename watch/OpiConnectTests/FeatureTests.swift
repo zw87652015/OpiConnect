@@ -146,4 +146,22 @@ final class FeatureTests: XCTestCase {
         XCTAssertNotNil(loud.sound)
         XCTAssertNil(loud.userInfo["q"])
     }
+
+    // MARK: dismiss
+
+    @MainActor
+    func testDismissAll() {
+        let model = AppModel.shared
+        PendingQueue.shared.clear()
+        func payload(_ id: String) -> NotifPayload {
+            NotifPayload(i: id, p: "com.app", a: "App", t: "T", b: "B", w: 1, x: nil, bt: nil, bc: nil)
+        }
+        model.insert(payload("d1"))
+        model.insert(payload("d2"))
+        XCTAssertEqual(model.items.count, 2)
+        model.dismissAll()
+        XCTAssertTrue(model.items.isEmpty)
+        XCTAssertEqual(PendingQueue.shared.count, 2)
+        PendingQueue.shared.clear()
+    }
 }

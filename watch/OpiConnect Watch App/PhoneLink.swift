@@ -176,8 +176,7 @@ final class PhoneLink: NSObject, ObservableObject {
         case .welcome:
             cancelTimers()
             status = .authenticated
-            UserDefaults.appGroup.set(true, forKey: "opi.paired")
-            AppModel.shared.paired = true
+            AppModel.shared.markPaired()
             if AppModel.shared.sendState == .sending, PendingQueue.shared.count == 0 {
                 AppModel.shared.sendState = .sent
             }

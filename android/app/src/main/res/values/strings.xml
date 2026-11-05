@@ -75,6 +75,8 @@
 
     <string name="error_bg_service">Couldn\'t start background service — open OpiLink</string>
     <string name="error_bt_permissions">Bluetooth permissions not granted</string>
+    <string name="error_ble_adv_unsupported">This phone can\'t advertise over Bluetooth LE — the watch can only get notifications via the relay</string>
+    <string name="error_ble_adv_failed">Bluetooth advertising failed (code %1$d), retrying — the watch can\'t connect directly</string>
     <string name="fg_notif_title">OpiLink is running</string>
     <string name="watch_connected">Watch connected</string>
     <string name="watch_connected_bg">Watch connected in background</string>

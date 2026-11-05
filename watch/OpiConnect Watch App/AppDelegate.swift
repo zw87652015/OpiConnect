@@ -55,6 +55,7 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
               let remove = try? JSONDecoder().decode(RemovePayload.self, from: data) else {
             return .noData
         }
+        AppModel.shared.markPaired()
         if let bt = remove.bt {
             SharedStore().saveStatus(PhoneStatus(bt: bt, bc: remove.bc ?? false, at: Date()))
         }
@@ -73,6 +74,7 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
 extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        if notification.request.content.userInfo["opi"] != nil { AppModel.shared.markPaired() }
         if notification.request.content.userInfo["q"] as? Bool == true { return [.list] }
         return [.banner, .sound, .list]
     }

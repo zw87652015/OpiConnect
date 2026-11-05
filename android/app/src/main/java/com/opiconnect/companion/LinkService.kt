@@ -524,7 +524,10 @@ class LinkService : Service() {
 
     private fun startAdvertising() {
         if (advertising || adapter?.isEnabled != true) return
-        val adv = adapter?.bluetoothLeAdvertiser ?: return
+        val adv = adapter?.bluetoothLeAdvertiser ?: run {
+            showAdvError(getString(R.string.error_ble_adv_unsupported))
+            return
+        }
         advertiser = adv
         val settings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
@@ -547,13 +550,32 @@ class LinkService : Service() {
     private val advertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
             advertising = true
+            clearAdvError()
         }
 
         override fun onStartFailure(errorCode: Int) {
+            if (errorCode == AdvertiseCallback.ADVERTISE_FAILED_ALREADY_STARTED) {
+                advertising = true
+                clearAdvError()
+                return
+            }
             advertising = false
             Log.w(TAG, "advertising failed: $errorCode, retrying in 10 s")
+            showAdvError(getString(R.string.error_ble_adv_failed, errorCode))
             handler.postDelayed({ startAdvertising() }, 10_000)
         }
+    }
+
+    private var advError: String? = null
+
+    private fun showAdvError(text: String) {
+        advError = text
+        AppState.setError(text)
+    }
+
+    private fun clearAdvError() {
+        if (advError != null && AppState.lastError.value == advError) AppState.setError(null)
+        advError = null
     }
 
     // MARK: adapter state

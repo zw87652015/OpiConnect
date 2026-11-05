@@ -75,6 +75,8 @@
 
     <string name="error_bg_service">无法启动后台服务——请打开 OpiLink</string>
     <string name="error_bt_permissions">未授予蓝牙权限</string>
+    <string name="error_ble_adv_unsupported">此手机不支持蓝牙 LE 广播——手表只能通过中继接收通知</string>
+    <string name="error_ble_adv_failed">蓝牙广播失败（代码 %1$d），正在重试——手表无法直接连接</string>
     <string name="fg_notif_title">OpiLink 正在运行</string>
     <string name="watch_connected">手表已连接</string>
     <string name="watch_connected_bg">手表已在后台连接</string>

@@ -17,6 +17,8 @@ struct OpiConnectApp: App {
             switch phase {
             case .active:
                 PhoneLink.shared.start(state: "active")
+                // The NSE/AppDelegate may have set the flag while we were suspended.
+                if !model.paired && UserDefaults.appGroup.bool(forKey: "opi.paired") { model.paired = true }
                 model.reload()
             case .background:
                 PhoneLink.shared.goBackground()

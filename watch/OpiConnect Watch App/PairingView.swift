@@ -9,7 +9,7 @@ struct PairingView: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 2) {
             if let qr {
                 Canvas { context, size in
                     let quiet = 2
@@ -25,16 +25,22 @@ struct PairingView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .aspectRatio(1, contentMode: .fit)
+                .layoutPriority(1)
             }
             Text("Scan with OpiLink on your Android phone")
-                .font(.footnote)
+                .font(.caption2)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
             Text(link.status.label)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
-        .padding()
+        .padding(.horizontal, 4)
+        .padding(.top, 2)
+        .padding(.bottom, 6)
+        .ignoresSafeArea(edges: .bottom)
         .onAppear { link.start(state: "active") }
     }
 }

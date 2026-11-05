@@ -59,6 +59,12 @@ final class AppModel: ObservableObject {
         path = [.detail(id: id)]
     }
 
+    func markPaired() {
+        guard !paired else { return }
+        UserDefaults.appGroup.set(true, forKey: "opi.paired")
+        paired = true
+    }
+
     func insert(_ payload: NotifPayload) {
         items.removeAll { $0.id == payload.i }
         items.insert(NotifItem(payload: payload), at: 0)

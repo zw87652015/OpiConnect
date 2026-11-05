@@ -75,6 +75,8 @@
 
     <string name="error_bg_service">無法啟動背景服務——請開啟 OpiLink</string>
     <string name="error_bt_permissions">未授予藍牙權限</string>
+    <string name="error_ble_adv_unsupported">此手機不支援藍牙 LE 廣播——手錶只能透過中繼接收通知</string>
+    <string name="error_ble_adv_failed">藍牙廣播失敗（代碼 %1$d），正在重試——手錶無法直接連線</string>
     <string name="fg_notif_title">OpiLink 正在執行</string>
     <string name="watch_connected">手錶已連線</string>
     <string name="watch_connected_bg">手錶已在背景連線</string>

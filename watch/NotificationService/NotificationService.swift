@@ -17,6 +17,9 @@ final class NotificationService: UNNotificationServiceExtension {
                   let sealed = OpiCrypto.base64urlDecode(c),
                   let data = try? OpiCrypto.open(sealed, using: PairingKeys.shared.encKey),
                   let payload = try? JSONDecoder().decode(NotifPayload.self, from: data) else { return }
+            // Opening the sealed payload proves the phone holds K: count as paired even
+            // when BLE advertising never reaches us.
+            UserDefaults(suiteName: PairingKeys.appGroup)?.set(true, forKey: "opi.paired")
             if let bt = payload.bt {
                 SharedStore().saveStatus(PhoneStatus(bt: bt, bc: payload.bc ?? false, at: Date()))
             }

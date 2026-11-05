@@ -38,10 +38,10 @@ object Router {
     fun onPosted(sbn: StatusBarNotification) {
         val context = OpiListenerService.instance ?: return
         val n = sbn.notification
-        if (n.category == Notification.CATEGORY_CALL ||
+        val callish = n.category == Notification.CATEGORY_CALL ||
             Calls.isCallPackage(context, sbn.packageName) ||
             n.fullScreenIntent != null
-        ) {
+        if (callish) {
             val e = n.extras
             Log.i(TAG, "call? pkg=${sbn.packageName} cat=${n.category} ongoing=${sbn.isOngoing} " +
                 "fgs=${n.flags and Notification.FLAG_FOREGROUND_SERVICE != 0} " +
@@ -57,15 +57,21 @@ object Router {
         }
         if (!Calls.isRinging(context, sbn) && ForwardPrefs.screenOffOnly(context) &&
             context.getSystemService(PowerManager::class.java)?.isInteractive == true
-        ) return
+        ) { if (callish) Log.i(TAG, "call? -> skipped (screen-off only)"); return }
         val payload = buildPayload(context, sbn) ?: run {
             val id = Crypto.notifId(sbn.key)
-            if (forwarded.remove(id) != null) sendRemove(id)
+            val removed = forwarded.remove(id) != null
+            if (removed) sendRemove(id)
+            if (callish) Log.i(TAG, "call? -> filtered${if (removed) ", remove sent" else ""}")
             return
         }
         val hash = contentHash(payload)
-        if (forwarded[payload.i] == hash) return // same content re-posted
+        if (forwarded[payload.i] == hash) { // same content re-posted
+            if (callish) Log.i(TAG, "call? -> duplicate")
+            return
+        }
         forwarded[payload.i] = hash
+        if (callish) Log.i(TAG, "call? -> deliver ${payload.i.take(6)}")
         deliver(payload)
     }
 
@@ -161,10 +167,13 @@ object Router {
                 val ack = CompletableDeferred<Unit>()
                 acks[payload.i] = ack
                 link.send(watch, Messages.Notif(payload))
-                if (withTimeoutOrNull(ACK_TIMEOUT_MS) { ack.await() } != null) return@launch
+                if (withTimeoutOrNull(ACK_TIMEOUT_MS) { ack.await() } != null) {
+                    Log.i(TAG, "delivered ${payload.i.take(6)} over BLE")
+                    return@launch
+                }
                 Log.i(TAG, "no BLE ack for ${payload.i}, falling back to relay")
             }
-            val keys = keys() ?: return@launch
+            val keys = keys() ?: run { Log.w(TAG, "no pairing keys, can't use relay"); return@launch }
             RelayClient.push(keys, "alert", payload.i, RelaySeal.sealForRelay(payload, keys.encKey))
         }
     }

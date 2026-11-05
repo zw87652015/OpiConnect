@@ -1,5 +1,6 @@
 package com.opiconnect.companion
 
+import android.util.Log
 import com.opiconnect.companion.core.Keys
 import kotlinx.coroutines.delay
 import okhttp3.MediaType.Companion.toMediaType
@@ -35,6 +36,7 @@ object RelayClient {
         repeat(2) { attempt ->
             try {
                 client.newCall(request).execute().use { resp ->
+                    Log.i("OpiRelay", "push $kind ${id.take(6)} -> ${resp.code}")
                     when (resp.code) {
                         200 -> {
                             AppState.setRelay(string(R.string.relay_sent))
@@ -56,6 +58,7 @@ object RelayClient {
                     return
                 }
             } catch (e: IOException) {
+                Log.w("OpiRelay", "push $kind ${id.take(6)} failed: $e")
                 if (attempt == 0) {
                     delay(5000)
                 } else {

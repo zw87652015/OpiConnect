@@ -49,6 +49,8 @@ object Router {
                 "callType=${runCatching { e.getInt("android.callType", -1) }.getOrDefault(-1)} " +
                 "answer=${e.containsKey(Notification.EXTRA_ANSWER_INTENT)} " +
                 "actions=${n.actions?.size ?: 0} " +
+                "audioMode=${Calls.audioMode(context)} " +
+                "chrono=${e.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER)} " +
                 "titleEmpty=${e.getCharSequence(Notification.EXTRA_TITLE).isNullOrEmpty()} " +
                 "textEmpty=${e.getCharSequence(Notification.EXTRA_TEXT).isNullOrEmpty()} " +
                 "ringing=${Calls.isRinging(context, sbn)}")

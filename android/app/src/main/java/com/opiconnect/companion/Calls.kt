@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Person
 import android.content.Context
 import android.graphics.drawable.Icon
+import android.media.AudioManager
 import android.service.notification.StatusBarNotification
 import android.telecom.TelecomManager
 
@@ -26,8 +27,15 @@ object Calls {
         }
         val callUi = n.category == Notification.CATEGORY_CALL ||
             (context != null && isCallPackage(context, sbn.packageName))
-        return callUi && n.fullScreenIntent != null
+        // Some OEM in-call UIs post the same plain notification while ringing and in a call;
+        // the audio mode (no permission needed) tells them apart.
+        return callUi && (n.fullScreenIntent != null || (context != null && audioRinging(context)))
     }
+
+    fun audioMode(context: Context): Int =
+        context.getSystemService(AudioManager::class.java)?.mode ?: AudioManager.MODE_INVALID
+
+    private fun audioRinging(context: Context) = audioMode(context) == AudioManager.MODE_RINGTONE
 
     fun isCallPackage(context: Context, pkg: String): Boolean {
         if (pkg == "com.android.server.telecom" || pkg.lowercase().contains("incallui")) return true

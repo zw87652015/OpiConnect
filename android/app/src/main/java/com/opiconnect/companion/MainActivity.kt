@@ -1,6 +1,7 @@
 package com.opiconnect.companion
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -13,6 +14,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -72,6 +77,7 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import com.opiconnect.companion.core.Crypto
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -109,7 +115,6 @@ fun SetupScreen() {
     var calendarApps by remember { mutableStateOf(emptyList<String>()) }
     var ringing by remember { mutableStateOf(false) }
     var paired by remember { mutableStateOf(PairingStore.isPaired(context)) }
-    var showOppoTips by remember { mutableStateOf(false) }
     var confirmUnpair by remember { mutableStateOf(false) }
     var cards by remember { mutableStateOf(CardStore.all(context)) }
     var editingCard by remember { mutableStateOf<OpiCard?>(null) }
@@ -214,6 +219,25 @@ fun SetupScreen() {
                 )
             }
 
+            WatchInternetCard()
+
+            TipsCard(stringResource(R.string.watch_status_help)) {
+                Text(stringResource(R.string.watch_status_intro), style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(8.dp))
+                StatusTable(
+                    stringResource(R.string.watch_status_link),
+                    stringArrayResource(R.array.watch_status_link_states),
+                    stringArrayResource(R.array.watch_status_link_meanings),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                StatusTable(
+                    stringResource(R.string.watch_status_cloud),
+                    stringArrayResource(R.array.watch_status_cloud_states),
+                    stringArrayResource(R.array.watch_status_cloud_meanings),
+                    stateColors = listOf(Color(0xFF2E7D32), Color(0xFFEF6C00)),
+                )
+            }
+
             StepCard(
                 title = stringResource(R.string.step_permissions),
                 done = permissionsGranted,
@@ -248,21 +272,8 @@ fun SetupScreen() {
                     ),
                 )
             }
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    TextButton(onClick = { showOppoTips = !showOppoTips }) {
-                        Text(
-                            stringResource(R.string.oppo_tips) +
-                                if (showOppoTips) " ▲" else " ▼",
-                        )
-                    }
-                    if (showOppoTips) {
-                        Text(
-                            stringResource(R.string.oppo_tips_body),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                }
+            TipsCard(stringResource(R.string.oppo_tips)) {
+                Text(stringResource(R.string.oppo_tips_body), style = MaterialTheme.typography.bodySmall)
             }
 
             Card(modifier = Modifier.fillMaxWidth()) {
@@ -485,6 +496,12 @@ fun SetupScreen() {
                             },
                         ),
                     )
+                    if (watchLink != AppState.WatchLink.ACTIVE) {
+                        Text(
+                            stringResource(R.string.watch_link_cloud_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                     lastRelay?.let {
                         Text(
                             stringResource(R.string.relay_line, it.text),
@@ -505,6 +522,22 @@ fun SetupScreen() {
                         Text(stringResource(R.string.send_test))
                     }
                 }
+            }
+
+            TipsCard(stringResource(R.string.status_help)) {
+                StatusTable(
+                    stringResource(R.string.status_help_link),
+                    stringArrayResource(R.array.status_link_states),
+                    stringArrayResource(R.array.status_link_meanings),
+                    colShows = stringResource(R.string.status_help_col),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                StatusTable(
+                    stringResource(R.string.status_help_relay),
+                    stringArrayResource(R.array.status_relay_states),
+                    stringArrayResource(R.array.status_relay_meanings),
+                    colShows = stringResource(R.string.status_help_col),
+                )
             }
 
             HorizontalDivider()
@@ -588,6 +621,109 @@ fun SetupScreen() {
             },
             onDismiss = { showCardEditor = false },
         )
+    }
+}
+
+@Composable
+private fun TipsCard(title: String, content: @Composable () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            TextButton(onClick = { expanded = !expanded }) {
+                Text(title + if (expanded) " ▲" else " ▼")
+            }
+            if (expanded) content()
+        }
+    }
+}
+
+private const val KEY_INTERNET_ACK = "watch_internet_ack"
+
+// Red until the user taps "Got it"; afterwards a normal card collapsed to its title.
+@Composable
+private fun WatchInternetCard() {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("opi", Context.MODE_PRIVATE) }
+    val scope = rememberCoroutineScope()
+    var acknowledged by remember { mutableStateOf(prefs.getBoolean(KEY_INTERNET_ACK, false)) }
+    var expanded by remember { mutableStateOf(!acknowledged) }
+    val normal = CardDefaults.cardColors()
+    val container by animateColorAsState(
+        if (acknowledged) normal.containerColor else MaterialTheme.colorScheme.errorContainer,
+        label = "internetCardContainer",
+    )
+    val content by animateColorAsState(
+        if (acknowledged) normal.contentColor else MaterialTheme.colorScheme.onErrorContainer,
+        label = "internetCardContent",
+    )
+    val title = stringResource(R.string.watch_internet_title)
+    Card(
+        modifier = Modifier.fillMaxWidth().animateContentSize(),
+        colors = CardDefaults.cardColors(containerColor = container, contentColor = content),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            if (acknowledged) {
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(title + if (expanded) " ▲" else " ▼")
+                }
+            } else {
+                Text(title, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+            if (expanded) {
+                Text(stringResource(R.string.watch_internet_body), style = MaterialTheme.typography.bodySmall)
+            }
+            if (!acknowledged) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = {
+                    acknowledged = true
+                    prefs.edit().putBoolean(KEY_INTERNET_ACK, true).apply()
+                    scope.launch {
+                        delay(400)
+                        expanded = false
+                    }
+                }) {
+                    Text(stringResource(R.string.got_it))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatusTable(
+    header: String,
+    states: Array<String>,
+    meanings: Array<String>,
+    stateColors: List<Color> = emptyList(),
+    colShows: String = stringResource(R.string.watch_status_col_shows),
+) {
+    Text(header, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
+    Spacer(modifier = Modifier.height(4.dp))
+    Row {
+        Text(
+            colShows,
+            modifier = Modifier.weight(0.38f),
+            style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+            stringResource(R.string.watch_status_col_meaning),
+            modifier = Modifier.weight(0.62f),
+            style = MaterialTheme.typography.labelMedium,
+        )
+    }
+    states.zip(meanings).forEachIndexed { i, (state, meaning) ->
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+        Row {
+            Text(
+                state,
+                modifier = Modifier.weight(0.38f).padding(end = 8.dp),
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                color = stateColors.getOrNull(i) ?: Color.Unspecified,
+            )
+            Text(meaning, modifier = Modifier.weight(0.62f), style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 

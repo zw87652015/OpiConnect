@@ -8,6 +8,38 @@
     <string name="language_zh_hans">简体中文</string>
     <string name="language_zh_hant">繁體中文</string>
 
+    <string name="watch_internet_title">Your watch needs internet</string>
+    <string name="watch_internet_body">Notifications reach your Apple Watch through Apple\'s push service, so the watch must be online — via Wi-Fi, a hotspot (such as this phone\'s), or cellular. Without internet, notifications won\'t arrive.</string>
+    <string name="watch_status_help">What the watch status means</string>
+    <string name="watch_status_intro">The top row of the watch app shows the phone link, this phone\'s battery ring, and a cloud icon.</string>
+    <string name="watch_status_col_shows">Watch shows</string>
+    <string name="watch_status_col_meaning">Meaning</string>
+    <string name="watch_status_link">Phone link (Bluetooth)</string>
+    <string name="watch_status_cloud">Cloud icon (push)</string>
+    <string-array name="watch_status_link_states">
+        <item>Connected</item>
+        <item>Connecting…</item>
+        <item>Searching…</item>
+        <item>Bluetooth off</item>
+        <item>Bluetooth not allowed</item>
+    </string-array>
+    <string-array name="watch_status_link_meanings">
+        <item>Direct link to this phone is active.</item>
+        <item>Phone found, setting up a secure link.</item>
+        <item>Looking for this phone. Normal when the watch app is in the background; notifications still arrive via the cloud.</item>
+        <item>Turn on Bluetooth on the watch.</item>
+        <item>Allow Bluetooth for OpiLink in the watch\'s Settings &gt; Privacy &amp; Security &gt; Bluetooth.</item>
+    </string-array>
+    <string-array name="watch_status_cloud_states">
+        <item>Green cloud ✓</item>
+        <item>Orange cloud !</item>
+    </string-array>
+    <string-array name="watch_status_cloud_meanings">
+        <item>Registered for push — notifications arrive anywhere the watch has internet.</item>
+        <item>Push isn\'t set up yet. Connect the watch to the internet and reopen the watch app.</item>
+    </string-array>
+    <string name="got_it">Got it</string>
+
     <string name="step_permissions">1. Permissions</string>
     <string name="permissions_done">Bluetooth + notifications granted</string>
     <string name="grant_permissions">Grant permissions</string>
@@ -55,6 +87,39 @@
     <string name="watch_link_active">active</string>
     <string name="watch_link_background">background</string>
     <string name="relay_line">Relay: %1$s</string>
+    <string name="watch_link_cloud_hint">Not directly connected? That\'s fine — notifications still reach the watch through the cloud as long as the watch has internet.</string>
+    <string name="status_help">What the status means</string>
+    <string name="status_help_col">Status</string>
+    <string name="status_help_link">Watch link (direct Bluetooth)</string>
+    <string name="status_help_relay">Relay (cloud delivery)</string>
+    <string-array name="status_link_states" translatable="false">
+        <item>@string/watch_link_none</item>
+        <item>@string/watch_link_connecting</item>
+        <item>@string/watch_link_background</item>
+        <item>@string/watch_link_active</item>
+    </string-array>
+    <string-array name="status_link_meanings">
+        <item>No direct link. Normal when the watch app is closed or the watch is out of range — notifications are delivered via the cloud.</item>
+        <item>The watch is nearby but the direct link isn\'t set up. Everything still works — notifications are delivered via the cloud.</item>
+        <item>Connected while the watch app is in the background. The link closes shortly after; that\'s normal.</item>
+        <item>The watch app is open and directly connected. Notifications arrive instantly over Bluetooth.</item>
+    </string-array>
+    <string-array name="status_relay_states" translatable="false">
+        <item>@string/relay_sent</item>
+        <item>@string/relay_not_registered</item>
+        <item>@string/relay_expired</item>
+        <item>@string/relay_rejected</item>
+        <item>@string/relay_rate_limited</item>
+        <item>@string/relay_no_connection</item>
+    </string-array>
+    <string-array name="status_relay_meanings">
+        <item>The last notification was handed to Apple\'s push service for the watch. Working normally.</item>
+        <item>The watch hasn\'t signed up for push yet. Open OpiLink on the watch while it has internet.</item>
+        <item>Open OpiLink on the watch while it has internet to refresh it.</item>
+        <item>Pairing no longer matches. Unpair and scan the watch QR again.</item>
+        <item>Too many notifications in a short time. Retries automatically.</item>
+        <item>This phone can\'t reach the relay. Check the phone\'s internet.</item>
+    </string-array>
     <string name="stop_ringing">Stop ringing</string>
     <string name="send_test">Send test notification</string>
     <string name="app_version">OpiLink %1$s</string>

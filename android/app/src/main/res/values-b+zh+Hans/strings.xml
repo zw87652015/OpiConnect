@@ -21,6 +21,56 @@
     <string name="oppo_tips">OPPO / ColorOS 提示</string>
     <string name="oppo_tips_body">设置 > 电池 > 应用耗电管理 > OpiLink > 允许后台活动和自启动。同时在最近任务中锁定 OpiLink，防止 ColorOS 将其关闭。</string>
     <string name="step_pairing">4. 配对</string>
+    <string name="watch_status_help">手表上的状态是什么意思</string>
+    <string name="watch_status_intro">手表 App 顶部一行依次显示手机连接状态、本手机电量环和云朵图标。</string>
+    <string name="watch_status_col_shows">手表显示</string>
+    <string name="watch_status_col_meaning">含义</string>
+    <string name="watch_status_link">手机连接（蓝牙）</string>
+    <string name="watch_status_cloud">云朵图标（推送）</string>
+    <string-array name="watch_status_link_states">
+        <item>已连接</item>
+        <item>正在连接…</item>
+        <item>正在搜索…</item>
+        <item>蓝牙已关闭</item>
+        <item>未授予蓝牙权限</item>
+    </string-array>
+    <string-array name="watch_status_link_meanings">
+        <item>已与本手机直接连接。</item>
+        <item>已找到手机，正在建立安全连接。</item>
+        <item>正在寻找本手机。手表 App 在后台时属于正常情况，通知仍会通过云端送达。</item>
+        <item>请在手表上打开蓝牙。</item>
+        <item>请在手表的“设置 &gt; 隐私与安全性 &gt; 蓝牙”中允许 OpiLink。</item>
+    </string-array>
+    <string-array name="watch_status_cloud_states">
+        <item>绿色云 ✓</item>
+        <item>橙色云 !</item>
+    </string-array>
+    <string-array name="watch_status_cloud_meanings">
+        <item>已注册推送，只要手表联网，在任何地方都能收到通知。</item>
+        <item>推送尚未就绪。请让手表联网，然后重新打开手表 App。</item>
+    </string-array>
+    <string name="got_it">知道了</string>
+    <string name="watch_link_cloud_hint">未直接连接？没关系——只要手表联网，通知仍会通过云端送达手表。</string>
+    <string name="status_help">状态是什么意思</string>
+    <string name="status_help_col">状态</string>
+    <string name="status_help_link">手表连接（蓝牙直连）</string>
+    <string name="status_help_relay">中继（云端送达）</string>
+    <string-array name="status_link_meanings">
+        <item>没有直连。手表 App 关闭或手表不在附近时属于正常情况——通知会通过云端送达。</item>
+        <item>手表在附近，但尚未建立直连。一切照常可用——通知会通过云端送达。</item>
+        <item>手表 App 在后台时已连接，连接稍后会自动断开，属于正常情况。</item>
+        <item>手表 App 已打开并直接连接，通知通过蓝牙即时送达。</item>
+    </string-array>
+    <string-array name="status_relay_meanings">
+        <item>最近一条通知已交给 Apple 推送服务发往手表，工作正常。</item>
+        <item>手表尚未注册推送。请在手表联网时打开 OpiLink。</item>
+        <item>请在手表联网时打开 OpiLink 以刷新。</item>
+        <item>配对信息不匹配。请解除配对并重新扫描手表二维码。</item>
+        <item>短时间内通知过多，会自动重试。</item>
+        <item>本手机无法连接中继。请检查手机网络。</item>
+    </string-array>
+    <string name="watch_internet_title">手表需要联网</string>
+    <string name="watch_internet_body">通知通过 Apple 推送服务送达 Apple Watch，因此手表必须联网——可使用 Wi-Fi、热点（例如本手机的热点）或蜂窝网络。手表未联网时将无法收到通知。</string>
     <string name="pair_id">配对 ID：%1$s…</string>
     <string name="unpair">取消配对</string>
     <string name="not_opi_qr">不是 OpiLink 二维码</string>

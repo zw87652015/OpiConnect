@@ -36,7 +36,7 @@ object ActionExecutor {
             AppState.setError(service.getString(R.string.error_notif_gone))
             return
         }
-        val action = sbn.notification.actions?.getOrNull(idx)
+        val action = Router.actionsOf(service, sbn).getOrNull(idx)
         if (action == null || action.title?.toString() != label) {
             Log.w(TAG, "action $idx label mismatch for $id")
             AppState.setError(service.getString(R.string.error_action_gone))

@@ -37,10 +37,14 @@ object Router {
 
     fun onPosted(sbn: StatusBarNotification) {
         val context = OpiListenerService.instance ?: return
-        if (ForwardPrefs.screenOffOnly(context) &&
+        if (!Calls.isRinging(sbn.notification) && ForwardPrefs.screenOffOnly(context) &&
             context.getSystemService(PowerManager::class.java)?.isInteractive == true
         ) return
-        val payload = buildPayload(context, sbn) ?: return
+        val payload = buildPayload(context, sbn) ?: run {
+            val id = Crypto.notifId(sbn.key)
+            if (forwarded.remove(id) != null) sendRemove(id)
+            return
+        }
         val hash = contentHash(payload)
         if (forwarded[payload.i] == hash) return // same content re-posted
         forwarded[payload.i] = hash
@@ -153,38 +157,49 @@ object Router {
         val context = OpiListenerService.instance
         if (sbn.packageName == context?.packageName) return false
         if (context != null && !ForwardPrefs.allows(context, sbn.packageName)) return false
-        if (sbn.isOngoing) return false
+        // Ringing calls are ongoing/foreground-service and often have no title/text.
+        val ringing = Calls.isRinging(sbn.notification)
+        if (!ringing && sbn.isOngoing) return false
         // Calendar apps: when watch reminders are active, their notifications would duplicate.
         if (context != null && CalendarSync.hasPermission(context) &&
             sbn.packageName in CalendarApps.packages(context)
         ) return false
         val flags = sbn.notification.flags
         if (flags and Notification.FLAG_GROUP_SUMMARY != 0) return false
-        if (flags and Notification.FLAG_FOREGROUND_SERVICE != 0) return false
-        val e = sbn.notification.extras
-        val title = e.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
-        val text = e.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
-        if (title.isEmpty() && text.isEmpty()) return false
+        if (!ringing && flags and Notification.FLAG_FOREGROUND_SERVICE != 0) return false
+        if (!ringing) {
+            val e = sbn.notification.extras
+            val title = e.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
+            val text = e.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
+            if (title.isEmpty() && text.isEmpty()) return false
+        }
         return true
     }
+
+    fun actionsOf(context: Context, sbn: StatusBarNotification): List<Notification.Action> =
+        if (Calls.isRinging(sbn.notification)) Calls.actions(context, sbn.notification)
+        else sbn.notification.actions.orEmpty().asList()
 
     private fun buildPayload(context: Context, sbn: StatusBarNotification): NotifPayload? {
         if (!passesFilter(sbn)) return null
         val n = sbn.notification
         val e = n.extras
-        val title = e.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
+        val ringing = Calls.isRinging(n)
+        var title = e.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
+        if (ringing && title.isEmpty()) title = Calls.caller(n).orEmpty()
         var body = e.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
             ?: e.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
         if (body.isEmpty()) {
             // MessagingStyle: use the last message text when EXTRA_TEXT is empty.
             body = messagingStyleText(e) ?: ""
         }
-        val actions = n.actions?.take(3)?.map { action ->
+        if (ringing && body.isEmpty()) body = context.getString(R.string.call_incoming)
+        val actions = actionsOf(context, sbn).take(3).map { action ->
             ActionInfo(
                 l = action.title?.toString().orEmpty(),
                 r = action.remoteInputs?.any { it.allowFreeFormInput } == true,
             )
-        } ?: emptyList()
+        }
         return NotifPayload(
             i = Crypto.notifId(sbn.key),
             p = sbn.packageName,

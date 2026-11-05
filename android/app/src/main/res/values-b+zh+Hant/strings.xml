@@ -104,4 +104,7 @@
     <string name="relay_no_connection">無法連線至中繼</string>
     <string name="error_notif_gone">通知已不存在</string>
     <string name="error_action_gone">操作已不可用</string>
+    <string name="call_incoming">來電</string>
+    <string name="call_answer">接聽</string>
+    <string name="call_decline">拒接</string>
 </resources>

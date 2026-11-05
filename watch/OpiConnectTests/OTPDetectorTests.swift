@@ -39,6 +39,9 @@ final class OTPDetectorTests: XCTestCase {
         assertDetect("Happy 2024! See you in 2025", nil)
         assertDetect("Your verification code was used on 2024-05-12 at 10:32", nil)
         assertDetect("Verify your email: https://example.com/v?t=839201", nil)
+        assertDetect("+86 130 3223 3871 天津 联通", title: "境外号码", nil)
+        assertDetect("来电号码 138 1234 5678", nil)
+        assertDetect("Incoming call +1 415 555 0132", title: "Phone", nil)
     }
 
     // MARK: display

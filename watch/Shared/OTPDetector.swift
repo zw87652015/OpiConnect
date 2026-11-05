@@ -45,8 +45,8 @@ enum OTPDetector {
 
         // a. Prefixed tokens like "G-123456" (case-sensitive).
         let prefixed = matches(#"(?<![0-9A-Za-z])[A-Z]{1,3}-\d{4,8}(?![0-9A-Za-z])"#, in: ns)
-        // b. Grouped digits like "123-456".
-        let grouped = matches(#"(?<![0-9A-Za-z+\-])\d{3,4}[ -]\d{3,4}(?![0-9A-Za-z])(?![ -]\d)"#, in: ns)
+        // b. Grouped digits like "123-456" (not the tail of a longer spaced number like a phone).
+        let grouped = matches(#"(?<![0-9A-Za-z+\-])(?<!\d[ -])\d{3,4}[ -]\d{3,4}(?![0-9A-Za-z])(?![ -]\d)"#, in: ns)
 
         var anchors = keywordRanges(in: ns, range: full, substrings: strongKeywords, wholeWords: strongWholeWords)
         if anchors.isEmpty {
@@ -55,6 +55,7 @@ enum OTPDetector {
             let hasValidity = !keywordRanges(in: ns, range: full, substrings: validityPhrases, wholeWords: []).isEmpty
             if hasValidity || !prefixed.isEmpty || !grouped.isEmpty {
                 anchors = keywordRanges(in: ns, range: full, substrings: weakKeywords, wholeWords: weakWholeWords)
+                    .filter { $0.location == 0 || ns.substring(with: NSRange(location: $0.location - 1, length: 1)) != "号" } // 号码 = phone number
             }
         }
         guard !anchors.isEmpty else { return nil }
@@ -173,7 +174,8 @@ enum OTPDetector {
         if r.location > 0 {
             let before = ns.character(at: r.location - 1)
             if before == 43 { return true } // '+'
-            if ".:/,-".utf16.contains(before), r.location > 1, isDigit(ns.character(at: r.location - 2)) {
+            // Also " " so a group inside a spaced number ("+86 130 3223 3871") doesn't count.
+            if ".:/,- ".utf16.contains(before), r.location > 1, isDigit(ns.character(at: r.location - 2)) {
                 return true
             }
         }

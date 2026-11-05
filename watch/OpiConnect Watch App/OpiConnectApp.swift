@@ -17,6 +17,7 @@ struct OpiConnectApp: App {
             switch phase {
             case .active:
                 PhoneLink.shared.start(state: "active")
+                Task { await model.refreshSubscription() }
                 // The NSE/AppDelegate may have set the flag while we were suspended.
                 if !model.paired && UserDefaults.appGroup.bool(forKey: "opi.paired") { model.paired = true }
                 model.reload()
@@ -28,6 +29,7 @@ struct OpiConnectApp: App {
             }
         }
         .backgroundTask(.appRefresh(AppDelegate.refreshTaskId)) {
+            await model.refreshSubscription()
             // Reconnect when paired: flush queued messages and pick up fresh
             // battery/calendar/media state (welcome + inbound burst, ~3 s quiet).
             if model.paired {

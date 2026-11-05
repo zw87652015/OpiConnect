@@ -1,6 +1,8 @@
 import Foundation
+import StoreKit
 import UserNotifications
 import WatchKit
+import WidgetKit
 
 struct NotifItem: Identifiable, Equatable {
     var id: String { payload.i }
@@ -24,6 +26,7 @@ final class AppModel: ObservableObject {
     @Published var media: MediaSnapshot?
     @Published var ringing = false
     @Published var calendar: CalendarCache?
+    @Published var subscribed = Subscription.isActive()
     @Published var path: [Route] = []
 
     let store = SharedStore()
@@ -59,6 +62,33 @@ final class AppModel: ObservableObject {
     func openNotification(id: String) {
         path = [.detail(id: id)]
     }
+
+    // Refresh the cached entitlement and update the UI. On change, widgets are
+    // reloaded; losing the subscription also drops scheduled calendar reminders.
+    func refreshSubscription() async {
+        guard !DemoMode.isActive else { return }
+        let expiry = await Subscription.refresh()
+        let active = Subscription.isActive(expiry: expiry)
+        guard active != subscribed else { return }
+        subscribed = active
+        WidgetCenter.shared.reloadAllTimelines()
+        if !active { await CalendarReminders.clear() }
+    }
+
+    // Called once at launch: refreshes the cache and finishes transaction updates.
+    func startSubscriptionUpdates() {
+        guard !DemoMode.isActive, subscriptionTask == nil else { return }
+        subscriptionTask = Task { [weak self] in
+            for await result in Transaction.updates {
+                guard case .verified(let transaction) = result else { continue }
+                await transaction.finish()
+                await self?.refreshSubscription()
+            }
+        }
+        Task { await refreshSubscription() }
+    }
+
+    private var subscriptionTask: Task<Void, Never>?
 
     func markPaired() {
         guard !paired else { return }

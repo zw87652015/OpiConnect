@@ -22,7 +22,11 @@ It starts by launching OpiLink on the watch and shows the typical flow:
 - With the watch app closed, a notification still arrives through Apple Push Notification service.
 - Find My Phone rings the phone, Now Playing controls the phone's music, the Calendar screen shows events, and complications show phone battery and the next event.
 - Settings > Unpair, which removes the pairing from the watch and the relay.
-The app has no accounts, no login, no user-generated content shared with others, and no paid content or In-App Purchases.
+The app has no accounts, no login and no user-generated content shared with others.
+
+1b. IN-APP PURCHASE (SANDBOX)
+OpiLink is a paid-features app with one auto-renewable subscription group (weekly, monthly, yearly), each with a free trial (introductory offer). Right after pairing, the watch shows a paywall (SubscriptionStoreView); without a subscription the app stays paired but shows a "Subscribe to OpiLink" placeholder instead of notification content, and Find Phone, music, calendar and the widgets are locked.
+To review: pair as above, then on the paywall pick any plan — in Sandbox the trial starts immediately and the app unlocks. "Restore Purchases" is on the paywall and in Settings → Subscription, which also shows the subscription status.
 
 2. PURPOSE AND AUDIENCE
 For people who wear an Apple Watch but use an Android phone. Apple Watch normally gets notifications only from an iPhone, so these users miss their phone's messages, codes and reminders on the wrist. OpiLink mirrors the Android phone's notifications to the watch, lets the user reply and dismiss them, and adds Find My Phone, music control and calendar.

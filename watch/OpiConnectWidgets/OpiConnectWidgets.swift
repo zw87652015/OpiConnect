@@ -36,6 +36,28 @@ private func L(_ en: String, _ hans: String, _ hant: String? = nil) -> String {
     }
 }
 
+// Shown by every widget while no subscription is active (cache-only check).
+private struct LockedView: View {
+    @Environment(\.widgetFamily) var family
+
+    var body: some View {
+        if family == .accessoryInline {
+            Text(L("Subscribe in OpiLink", "在 OpiLink 中订阅", "在 OpiLink 中訂閱"))
+        } else {
+            ViewThatFits {
+                VStack(spacing: 2) {
+                    Image(systemName: "lock.fill")
+                    Text(L("Subscribe in OpiLink", "在 OpiLink 中订阅", "在 OpiLink 中訂閱"))
+                        .font(.caption2)
+                }
+                Image(systemName: "lock.fill")
+            }
+        }
+    }
+}
+
+private var locked: Bool { !Subscription.isActive() }
+
 // MARK: - Battery
 
 struct BatteryEntry: TimelineEntry {
@@ -83,6 +105,9 @@ private struct BatteryView: View {
 
     var body: some View {
         Group {
+            if locked {
+                LockedView()
+            } else {
             switch family {
             case .accessoryCircular:
                 Gauge(value: Double(max(0, entry.status?.bt ?? 0)) / 100) {
@@ -124,6 +149,7 @@ private struct BatteryView: View {
                 } else {
                     Text(L("Phone battery —", "手机电量 —", "手機電量 —"))
                 }
+            }
             }
         }
         .opacity(stale ? 0.5 : 1)
@@ -222,7 +248,9 @@ private struct NextEventView: View {
     }
 
     var body: some View {
-        if let e = entry.event {
+        if locked {
+            LockedView()
+        } else if let e = entry.event {
             switch family {
             case .accessoryInline:
                 Text(verbatim: "\(timeString) \(e.t)")
@@ -264,7 +292,13 @@ struct SimpleEntry: TimelineEntry {
 struct FindPhoneWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "opi.findphone", provider: StaticProvider { SimpleEntry(date: $0, media: nil) }) { _ in
-            Image(systemName: "iphone.radiowaves.left.and.right")
+            Group {
+                if locked {
+                    LockedView()
+                } else {
+                    Image(systemName: "iphone.radiowaves.left.and.right")
+                }
+            }
                 .containerBackground(.fill.tertiary, for: .widget)
                 .widgetURL(URL(string: "opiconnect://findphone"))
         }
@@ -278,7 +312,9 @@ struct MusicWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "opi.music", provider: StaticProvider { SimpleEntry(date: $0, media: store.media()) }) { entry in
             Group {
-                if let m = entry.media, m.on, !m.t.isEmpty {
+                if locked {
+                    LockedView()
+                } else if let m = entry.media, m.on, !m.t.isEmpty {
                     VStack(alignment: .leading, spacing: 1) {
                         Image(systemName: "music.note")
                         Text(m.t).font(.caption).lineLimit(1)

@@ -29,6 +29,10 @@ final class NotificationService: UNNotificationServiceExtension {
             if let bt = payload.bt {
                 SharedStore().saveStatus(PhoneStatus(bt: bt, bc: payload.bc ?? false, at: Date()))
             }
+            // Locked placeholder first, so a StoreKit stall (or timeWillExpire) still
+            // delivers it via the deferred finish rather than the generic alert.
+            lock.withLock { bestAttempt = NotificationContent.locked() }
+            guard await Subscription.isActiveRefreshing() else { return }
             let content = NotificationContent.make(for: payload)
             lock.withLock { bestAttempt = content }
             // Category registration can stall in the extension; never let it hold back the

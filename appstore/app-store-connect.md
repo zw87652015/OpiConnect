@@ -13,7 +13,7 @@ These are the non-listing fields, with the reasoning behind each answer so you c
 | Primary category | Utilities |
 | Secondary category | Productivity |
 | Content rights | No third-party content. The app only shows the user's own notifications. |
-| Price | Free, no in-app purchases (**DECIDE** if otherwise) |
+| Price | Free, with auto-renewable subscriptions: `uk.luojiajiang.OpiConnect.Linker.Weekly`, `…Monthly`, `…Yearly` (one group, free trial (introductory offer) each). Requires the Paid Apps Agreement (Agreements, Tax and Banking) before the products can be created |
 | Availability | All countries **except China mainland** (no MIIT/ICP app filing). EU needs a Digital Services Act trader declaration; see below. |
 | watchOS-only | Yes (`WKWatchOnly`), so screenshots are only needed for Apple Watch |
 

@@ -39,6 +39,10 @@ Calendar events, music and playback information, Find Phone commands, replies, a
 - **Apple Watch:** notifications (to show mirrored notifications), Bluetooth (to talk to your phone).
 - **Android:** notification access (to read the notifications you choose to mirror), Bluetooth, calendar (optional, to show events and reminders on the watch), battery-optimization exemption (to keep the link running).
 
+## Purchases
+
+Subscriptions are bought through the App Store and processed entirely by Apple. We receive no payment information — no name, card number or billing address — only the fact that a subscription is active on your Apple Account.
+
 ## Sharing
 
 We don't sell, rent or share your data. Apart from Apple delivering pushes, no third parties are involved.
@@ -105,6 +109,10 @@ OpiLink 由 Apple Watch App、安卓配套 App 和推送中转服务器组成，
 
 - **Apple Watch：** 通知（显示同步的通知）、蓝牙（与手机通信）。
 - **安卓：** 通知使用权（读取你要同步的通知）、蓝牙、日历（可选，用于在手表上显示日程和提醒）、忽略电池优化（保持连接）。
+
+## 购买
+
+订阅通过 App Store 购买，支付全程由 Apple 处理。我们不会收到任何支付信息——没有姓名、卡号或账单地址——只能知道你的 Apple 账户上订阅是否有效。
 
 ## 共享
 

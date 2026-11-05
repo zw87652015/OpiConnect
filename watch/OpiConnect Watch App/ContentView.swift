@@ -5,7 +5,11 @@ struct ContentView: View {
 
     var body: some View {
         if model.paired {
-            HomeView()
+            if model.subscribed {
+                HomeView()
+            } else {
+                PaywallView()
+            }
         } else {
             PairingView()
         }

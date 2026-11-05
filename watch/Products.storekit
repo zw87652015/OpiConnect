@@ -1,0 +1,181 @@
+{
+  "identifier" : "F1A2B3C4D5E6F708192A3B4C",
+  "nonRenewables" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "",
+    "_developerTeamID" : "",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_renewRate" : "always",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21358ABC",
+      "localizations" : [
+
+      ],
+      "name" : "OpiLink",
+      "products" : [
+        {
+          "displayName" : "Weekly",
+          "displayPrice" : "0.99",
+          "familyShareable" : false,
+          "internalID" : "3B9E00000000000000000001",
+          "introductoryOffer" : {
+            "internalID" : "3B9E00000000000000000F01",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W",
+            "type" : "IntroductoryOffer"
+          },
+          "localizations" : [
+            {
+              "description" : "Weekly OpiLink subscription",
+              "displayName" : "OpiLink Weekly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "OpiLink 每周订阅",
+              "displayName" : "OpiLink 每周",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "OpiLink 每週訂閱",
+              "displayName" : "OpiLink 每週",
+              "locale" : "zh_TW"
+            }
+          ],
+          "productID" : "uk.luojiajiang.OpiConnect.Linker.Weekly",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "OpiLink Weekly",
+          "subscriptionGroupID" : "21358ABC",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "displayName" : "Monthly",
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "internalID" : "3B9E00000000000000000002",
+          "introductoryOffer" : {
+            "internalID" : "3B9E00000000000000000F02",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W",
+            "type" : "IntroductoryOffer"
+          },
+          "localizations" : [
+            {
+              "description" : "Monthly OpiLink subscription",
+              "displayName" : "OpiLink Monthly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "OpiLink 每月订阅",
+              "displayName" : "OpiLink 每月",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "OpiLink 每月訂閱",
+              "displayName" : "OpiLink 每月",
+              "locale" : "zh_TW"
+            }
+          ],
+          "productID" : "uk.luojiajiang.OpiConnect.Linker.Monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "OpiLink Monthly",
+          "subscriptionGroupID" : "21358ABC",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "displayName" : "Yearly",
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "internalID" : "3B9E00000000000000000003",
+          "introductoryOffer" : {
+            "internalID" : "3B9E00000000000000000F03",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W",
+            "type" : "IntroductoryOffer"
+          },
+          "localizations" : [
+            {
+              "description" : "Yearly OpiLink subscription",
+              "displayName" : "OpiLink Yearly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "OpiLink 每年订阅",
+              "displayName" : "OpiLink 每年",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "OpiLink 每年訂閱",
+              "displayName" : "OpiLink 每年",
+              "locale" : "zh_TW"
+            }
+          ],
+          "productID" : "uk.luojiajiang.OpiConnect.Linker.Yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "OpiLink Yearly",
+          "subscriptionGroupID" : "21358ABC",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

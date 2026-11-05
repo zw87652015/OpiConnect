@@ -55,6 +55,11 @@ GOOD TO KNOW
 • Background delivery uses Apple's push service, so your watch needs a connection through its iPhone, Wi-Fi or cellular.
 • Very long notifications are shortened to fit Apple's push size limit.
 • watchOS limits background Bluetooth, so replies and dismissals made while the phone is out of reach are queued and sent the next time the watch app connects.
+
+SUBSCRIPTION
+OpiLink requires an auto-renewable subscription (weekly, monthly or yearly; a free trial is included for new subscribers). Payment is charged to your Apple Account at confirmation of purchase. The subscription renews automatically unless you cancel it in your App Store account settings at least 24 hours before the end of the current period.
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://github.com/zw87652015/OpiConnect/blob/main/appstore/privacy-policy.md
 ```
 
 ## Keywords (max 100, comma-separated, no spaces)

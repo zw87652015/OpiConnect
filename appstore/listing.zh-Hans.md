@@ -55,6 +55,11 @@ OpiLink 把安卓手机上的通知同步到你的 Apple Watch。
 • 后台推送依赖 Apple 推送服务，手表需要通过配对的 iPhone、Wi-Fi 或蜂窝网络联网。
 • 过长的通知会被截断，以符合 Apple 推送的大小限制。
 • watchOS 会限制后台蓝牙，手机不在附近时，回复和清除操作会先保存在手表上，等手表 App 下次连接时再发送。
+
+订阅
+OpiLink 需要自动续期订阅（每周、每月或每年；新订阅者可享免费试用）。确认购买后，费用将从你的 Apple 账户扣除。除非你在当前订阅期结束前至少 24 小时在 App Store 账户设置中取消，否则订阅会自动续期。
+使用条款：https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+隐私政策：https://github.com/zw87652015/OpiConnect/blob/main/appstore/privacy-policy.md
 ```
 
 ## 关键词 Keywords (max 100, comma-separated)

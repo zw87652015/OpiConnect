@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
     func applicationDidFinishLaunching() {
         // Demo mode: no permission prompts and no APNs registration.
         guard !DemoMode.isActive else { return }
+        AppModel.shared.startSubscriptionUpdates()
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
@@ -121,7 +122,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                                     trigger: nil)
                 try? await center.add(request)
             }
-        } else {
+        } else if AppModel.shared.subscribed {
             AppModel.shared.openNotification(id: id)
         }
     }

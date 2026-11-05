@@ -19,4 +19,15 @@ enum NotificationContent {
         content.userInfo = quiet ? ["opi": payload.jsonObject, "q": true] : ["opi": payload.jsonObject]
         return content
     }
+
+    // Placeholder shown while the subscription is inactive: carries no "opi" payload,
+    // so AppModel.reload ignores it and a tap can't open a detail view.
+    static func locked() -> UNMutableNotificationContent {
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "OpiLink", table: "Shared")
+        content.body = String(localized: "Subscribe to OpiLink to see your notifications.", table: "Shared")
+        content.interruptionLevel = .passive
+        content.threadIdentifier = "opi.locked"
+        return content
+    }
 }

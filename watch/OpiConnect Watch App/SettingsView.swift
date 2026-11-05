@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 struct SettingsView: View {
     @EnvironmentObject private var model: AppModel
@@ -19,12 +20,29 @@ struct SettingsView: View {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "-"
     }
 
+    private var subscriptionText: String {
+        guard model.subscribed, let expiry = Subscription.cachedExpiry() else {
+            return String(localized: "Not subscribed")
+        }
+        if expiry == .distantFuture { return String(localized: "Active") }
+        return String(localized: "Active until \(expiry.formatted(date: .abbreviated, time: .omitted))")
+    }
+
     var body: some View {
         List {
             Section {
                 LabeledContent("Pair ID", value: String(PairingKeys.shared.pairId.prefix(8)))
                 LabeledContent("Relay", value: relayURL)
                 LabeledContent("Version", value: version)
+            }
+            Section("Subscription") {
+                LabeledContent("Status", value: subscriptionText)
+                Button("Restore Purchases") {
+                    Task {
+                        try? await AppStore.sync()
+                        await model.refreshSubscription()
+                    }
+                }
             }
             Section("Diagnostics") {
                 LabeledContent("Link", value: link.status.rawValue)

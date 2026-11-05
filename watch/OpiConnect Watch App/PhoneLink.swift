@@ -184,12 +184,20 @@ final class PhoneLink: NSObject, ObservableObject {
             flush()
         case .notif(let payload):
             Task {
-                await Categories.ensureRegistered(for: payload)
+                // Locked: still ack the phone, but deliver a placeholder that carries
+                // no "opi" payload (ignored by reload and the tap handler).
+                let content: UNMutableNotificationContent
+                if AppModel.shared.subscribed {
+                    await Categories.ensureRegistered(for: payload)
+                    content = NotificationContent.make(for: payload)
+                } else {
+                    content = NotificationContent.locked()
+                }
                 let request = UNNotificationRequest(identifier: payload.i,
-                                                    content: NotificationContent.make(for: payload),
+                                                    content: content,
                                                     trigger: nil)
                 try? await UNUserNotificationCenter.current().add(request)
-                AppModel.shared.insert(payload)
+                if AppModel.shared.subscribed { AppModel.shared.insert(payload) }
                 self.send(.ack(id: payload.i))
             }
         case .remove(let id):
@@ -208,7 +216,9 @@ final class PhoneLink: NSObject, ObservableObject {
         case .cal(let cache):
             AppModel.shared.calendar = cache
             AppModel.shared.store.saveCalendar(cache)
-            Task { await CalendarReminders.reschedule(events: cache.events) }
+            if AppModel.shared.subscribed {
+                Task { await CalendarReminders.reschedule(events: cache.events) }
+            }
         case .hello, .state, .ack, .dismiss, .action, .findphone, .media, .calSync:
             break
         }

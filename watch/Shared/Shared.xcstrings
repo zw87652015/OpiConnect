@@ -49,6 +49,22 @@
         }
       }
     },
+    "OpiLink": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpiLink"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpiLink"
+          }
+        }
+      }
+    },
     "Send": {
       "localizations": {
         "zh-Hans": {
@@ -61,6 +77,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "傳送"
+          }
+        }
+      }
+    },
+    "Subscribe to OpiLink to see your notifications.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "订阅 OpiLink 后即可查看通知。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訂閱 OpiLink 後即可查看通知。"
           }
         }
       }

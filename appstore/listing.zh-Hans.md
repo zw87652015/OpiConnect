@@ -48,7 +48,7 @@ OpiLink 把安卓手机上的通知同步到你的 Apple Watch。
 
 使用要求
 • 运行 watchOS 10 或更高版本的 Apple Watch
-• 运行 Android 14 或更高版本的安卓手机，并安装 OpiLink 配套 App（可在项目的 GitHub Releases 页面免费下载，见技术支持链接）
+• 运行 Android 14 或更高版本的安卓手机，并安装 OpiLink 配套 App（免费下载：https://github.com/zw87652015/OpiConnect/releases）
 • 在安卓系统中为配套 App 开启通知使用权
 
 须知

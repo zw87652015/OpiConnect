@@ -48,7 +48,7 @@ PRIVATE BY DESIGN
 
 REQUIREMENTS
 • An Apple Watch running watchOS 10 or later
-• An Android phone running Android 14 or later with the OpiLink companion app, which is free from the project's GitHub Releases page (see the support link)
+• An Android phone running Android 14 or later with the OpiLink companion app, free from https://github.com/zw87652015/OpiConnect/releases
 • Notification access granted to the companion app on Android
 
 GOOD TO KNOW

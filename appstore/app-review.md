@@ -11,24 +11,43 @@ Luojia Jiang, email: me@luojiajiang.uk.
 ## Notes for the reviewer (paste into "Notes", max 4000)
 
 ```
-OpiLink is a watch-only app that mirrors notifications from an Android phone to Apple Watch. It needs the free OpiLink companion app on an Android phone (Android 14+). The companion's source is public and it is distributed on GitHub Releases: https://github.com/zw87652015/OpiConnect/releases
+1. SCREEN RECORDING
+Recorded on a physical Apple Watch running watchOS <VERSION> (with a physical Android phone): <VIDEO LINK>
+watchOS has no built-in screen recording and the flow involves two devices, so the video films the watch and phone screens together in one continuous shot.
+It starts by launching OpiLink on the watch and shows the typical flow:
+- The watch shows a pairing QR code. On the Android phone, the OpiLink companion is granted notification access and scans the code. The watch switches to its home screen.
+- A message arrives on the phone and appears on the watch. We reply by dictation and the reply is sent from the phone.
+- A sign-in SMS arrives and its one-time code is shown in large type.
+- Dismissing a notification on the watch clears it on the phone, and the other way round.
+- With the watch app closed, a notification still arrives through Apple Push Notification service.
+- Find My Phone rings the phone, Now Playing controls the phone's music, the Calendar screen shows events, and complications show phone battery and the next event.
+- Settings > Unpair, which removes the pairing from the watch and the relay.
+The app has no accounts, no login, no user-generated content shared with others, and no paid content or In-App Purchases.
 
-Because reviewers usually don't have an Android phone, we attached a demo video showing the complete flow on real devices: <VIDEO LINK>
+2. PURPOSE AND AUDIENCE
+For people who wear an Apple Watch but use an Android phone. Apple Watch normally gets notifications only from an iPhone, so these users miss their phone's messages, codes and reminders on the wrist. OpiLink mirrors the Android phone's notifications to the watch, lets the user reply and dismiss them, and adds Find My Phone, music control and calendar.
 
-What the video shows:
-1. Launch OpiLink on Apple Watch. It shows a pairing QR code.
-2. On the Android phone, open the OpiLink companion, grant notification access, and scan the QR code. The watch switches to the home screen.
-3. A message arrives on the phone and appears on the watch. We reply by dictation, and the reply is sent from the phone.
-4. A sign-in SMS with a one-time code arrives, and the code is shown in large type on the watch.
-5. Dismissing the notification on the watch clears it on the phone, and the other way round.
-6. With the watch app closed, a notification still arrives through Apple Push Notification service and is decrypted by the Notification Service Extension.
-7. Find Phone rings the phone. Now Playing controls the phone's music. The Calendar screen shows synced events. Complications show the phone battery and the next event.
+3. SETUP AND MAIN FEATURES
+- Install the free OpiLink companion app on an Android 14+ phone: https://github.com/zw87652015/OpiConnect/releases (source code is public in the same repository).
+- Open OpiLink on the watch and allow notifications. A QR code appears.
+- In the companion app, grant notification access and tap "Scan watch QR". Pairing completes; no login or credentials are needed.
+- Notifications then appear on the watch. Find My Phone, Now Playing, Calendar and Settings are on the watch home screen.
+Without an Android phone, the watch app launches to the pairing screen, requests notification permission and registers for push; the Bluetooth prompt appears when it looks for the phone.
 
-Without a phone you can still check the following on the watch: the app launches to the pairing screen, requests notification permission, and registers for push. The Bluetooth permission prompt appears when the app starts looking for the phone.
+4. EXTERNAL SERVICES
+- Apple Push Notification service: delivers notifications when the watch app isn't open.
+- Our own relay server (push.luojiajiang.uk): forwards end-to-end encrypted (AES-256-GCM) data to APNs. It stores only the APNs token, a random pairing ID and a hash of a pairing secret, and can't read notification content.
+- Bluetooth LE: direct link to the user's own paired phone while the app is open.
+- GitHub Releases: distribution of the free Android companion app.
+No third-party data providers, authentication, payment, analytics, advertising or AI services are used.
 
-Privacy: all notification content is end-to-end encrypted (AES-256-GCM) with a key created on the watch and shared only through the QR code. Our relay server forwards ciphertext to APNs and stores only the APNs token and a random pairing ID. There are no accounts, ads or analytics.
+5. REGIONAL DIFFERENCES
+None. The app works the same in all regions.
 
-Bluetooth is used only to talk to the user's own paired phone while the app is open. Background modes: bluetooth-central (keeps the link while the app is in use) and remote-notification (removes notifications dismissed on the phone).
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+Not applicable. The app isn't in a regulated industry and contains no protected third-party content. It shows only the user's own notifications from their own phone.
+
+Background modes: bluetooth-central (keeps the link to the paired phone while the app is in use) and remote-notification (removes notifications dismissed on the phone).
 ```
 
 ## Attachment: demo video

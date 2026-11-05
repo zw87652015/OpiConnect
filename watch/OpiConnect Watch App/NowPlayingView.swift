@@ -5,6 +5,7 @@ struct NowPlayingView: View {
     @StateObject private var link = PhoneLink.shared
     @State private var volume: Double = 0
     @State private var crownIdle: DispatchWorkItem?
+    @FocusState private var crownFocused: Bool
 
     private var media: MediaSnapshot? { model.media }
 
@@ -36,7 +37,10 @@ struct NowPlayingView: View {
             }
         }
         .navigationTitle("Now Playing")
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .focusable()
+        .focused($crownFocused)
+        .focusEffectDisabled()
         .digitalCrownRotation(
             $volume,
             from: 0, through: 1, by: 0.05,
@@ -45,20 +49,32 @@ struct NowPlayingView: View {
             isHapticFeedbackEnabled: true,
         )
         .onChange(of: volume) { _, v in
+            // Skip echoes: a phone-side volume update shouldn't bounce back as a command.
+            guard abs(v - (media?.v ?? -1)) >= 0.001 else { return }
             // Send volume changes debounced at 200 ms.
             crownIdle?.cancel()
-            let item = DispatchWorkItem { link.send(.media(cmd: "vol", v: v)) }
+            let item = DispatchWorkItem {
+                link.send(.media(cmd: "vol", v: v))
+                crownIdle = nil
+            }
             crownIdle = item
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: item)
         }
+        .onChange(of: media?.v) { _, v in
+            // Don't fight a crown turn in progress; otherwise track the phone's volume.
+            guard let v, crownIdle == nil else { return }
+            volume = v
+        }
         .onAppear {
             link.start(state: "active")
+            crownFocused = true
             if let m = media { volume = m.v }
         }
     }
 
     private func send(_ cmd: String) {
         link.send(.media(cmd: cmd))
+        crownFocused = true // tapping a button can steal crown focus
         if link.status != .authenticated { link.start(state: "active") }
     }
 }

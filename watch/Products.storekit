@@ -63,7 +63,7 @@
   },
   "subscriptionGroups" : [
     {
-      "id" : "21358ABC",
+      "id" : "22549066",
       "localizations" : [
 
       ],
@@ -100,7 +100,7 @@
           "productID" : "uk.luojiajiang.OpiConnect.Linker.Weekly",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "OpiLink Weekly",
-          "subscriptionGroupID" : "21358ABC",
+          "subscriptionGroupID" : "22549066",
           "type" : "RecurringSubscription"
         },
         {
@@ -134,7 +134,7 @@
           "productID" : "uk.luojiajiang.OpiConnect.Linker.Monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "OpiLink Monthly",
-          "subscriptionGroupID" : "21358ABC",
+          "subscriptionGroupID" : "22549066",
           "type" : "RecurringSubscription"
         },
         {
@@ -168,7 +168,7 @@
           "productID" : "uk.luojiajiang.OpiConnect.Linker.Yearly",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "OpiLink Yearly",
-          "subscriptionGroupID" : "21358ABC",
+          "subscriptionGroupID" : "22549066",
           "type" : "RecurringSubscription"
         }
       ]

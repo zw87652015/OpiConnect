@@ -11,6 +11,9 @@ enum Subscription {
         "uk.luojiajiang.OpiConnect.Linker.Yearly",
     ]
 
+    // App Store Connect subscription group ID (also "id" in Products.storekit).
+    static let groupID = "22549066"
+
     static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     static let privacyURL = URL(string: "https://github.com/zw87652015/OpiConnect/blob/main/appstore/privacy-policy.md")!
 

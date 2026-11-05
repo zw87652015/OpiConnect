@@ -449,6 +449,22 @@
         }
       }
     },
+    "No active subscription found": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到有效订阅"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到有效訂閱"
+          }
+        }
+      }
+    },
     "No upcoming events": {
       "localizations": {
         "zh-Hans": {
@@ -525,6 +541,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在播放"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
           }
         }
       }
@@ -861,6 +893,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在同步…"
+          }
+        }
+      }
+    },
+    "This Apple Account doesn't have an active OpiLink subscription.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 Apple 账户没有有效的 OpiLink 订阅。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 Apple 帳號沒有有效的 OpiLink 訂閱。"
           }
         }
       }

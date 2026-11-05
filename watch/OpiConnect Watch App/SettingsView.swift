@@ -4,6 +4,8 @@ import StoreKit
 struct SettingsView: View {
     @EnvironmentObject private var model: AppModel
     @State private var confirmUnpair = false
+    @State private var restoring = false
+    @State private var noSubscriptionFound = false
     @StateObject private var link = PhoneLink.shared
 
     private var calendarText: String {
@@ -39,10 +41,14 @@ struct SettingsView: View {
                 LabeledContent("Status", value: subscriptionText)
                 Button("Restore Purchases") {
                     Task {
+                        restoring = true
+                        defer { restoring = false }
                         try? await AppStore.sync()
                         await model.refreshSubscription()
+                        if !model.subscribed { noSubscriptionFound = true }
                     }
                 }
+                .disabled(restoring)
             }
             Section("Diagnostics") {
                 LabeledContent("Link", value: link.status.rawValue)
@@ -59,6 +65,11 @@ struct SettingsView: View {
         .confirmationDialog("Unpair this phone?", isPresented: $confirmUnpair) {
             Button("Unpair", role: .destructive) { model.unpair() }
             Button("Cancel", role: .cancel) {}
+        }
+        .alert("No active subscription found", isPresented: $noSubscriptionFound) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("This Apple Account doesn't have an active OpiLink subscription.")
         }
     }
 }

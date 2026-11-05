@@ -1,17 +1,23 @@
+import Foundation
 import UserNotifications
 
 // Decrypts the sealed payload in userInfo["c"] (base64url) and replaces the
 // generic "New notification" alert with the real content.
 final class NotificationService: UNNotificationServiceExtension {
+    // Work runs off the main actor (the extension's main queue isn't reliably serviced);
+    // the lock guards handler/bestAttempt, which the timeout and expiry paths also touch.
+    private let lock = NSLock()
     private var handler: ((UNNotificationContent) -> Void)?
     private var bestAttempt: UNMutableNotificationContent?
 
     override func didReceive(_ request: UNNotificationRequest,
                              withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        handler = contentHandler
-        bestAttempt = request.content.mutableCopy() as? UNMutableNotificationContent
+        lock.withLock {
+            handler = contentHandler
+            bestAttempt = request.content.mutableCopy() as? UNMutableNotificationContent
+        }
 
-        Task { @MainActor in
+        Task {
             defer { finish() }
             guard let c = request.content.userInfo["c"] as? String,
                   let sealed = OpiCrypto.base64urlDecode(c),
@@ -23,10 +29,11 @@ final class NotificationService: UNNotificationServiceExtension {
             if let bt = payload.bt {
                 SharedStore().saveStatus(PhoneStatus(bt: bt, bc: payload.bc ?? false, at: Date()))
             }
-            bestAttempt = NotificationContent.make(for: payload)
+            let content = NotificationContent.make(for: payload)
+            lock.withLock { bestAttempt = content }
             // Category registration can stall in the extension; never let it hold back the
             // decrypted content (worst case the alert shows without action buttons).
-            Task { @MainActor in
+            Task {
                 try? await Task.sleep(for: .seconds(3))
                 self.finish()
             }
@@ -39,8 +46,10 @@ final class NotificationService: UNNotificationServiceExtension {
     }
 
     private func finish() {
-        guard let handler, let bestAttempt else { return }
-        self.handler = nil
-        handler(bestAttempt)
+        let (handler, content) = lock.withLock { () -> (((UNNotificationContent) -> Void)?, UNMutableNotificationContent?) in
+            defer { self.handler = nil }
+            return (self.handler, bestAttempt)
+        }
+        if let handler, let content { handler(content) }
     }
 }

@@ -1,10 +1,13 @@
 import SwiftUI
 
 struct NowPlayingView: View {
+    private static let crownDetentCount = 101.0
+    private static let volumePerDetent = 0.05
+
     @EnvironmentObject private var model: AppModel
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var link = PhoneLink.shared
-    @State private var crownOffset = 0.0
+    @State private var crownDetent = 50.0
     @State private var targetVolume: Double?
     @FocusState private var crownFocused: Bool
 
@@ -46,11 +49,23 @@ struct NowPlayingView: View {
         .focused($crownFocused)
         .focusEffectDisabled()
         // Keep the system's crown position separate from the phone's volume.
-        .digitalCrownRotation($crownOffset, onIdle: { targetVolume = nil })
-        .onChange(of: crownOffset) { old, new in
+        .digitalCrownRotation(
+            detent: $crownDetent,
+            from: 0, through: Self.crownDetentCount - 1, by: 1,
+            sensitivity: .low,
+            isContinuous: true,
+            onIdle: { targetVolume = nil }
+        )
+        .scrollIndicators(.never)
+        .onChange(of: crownDetent) { old, new in
             guard scenePhase == .active, link.canAdjustMediaVolume, let media else { return }
+            let distance = new - old
+            let wraps = (distance / Self.crownDetentCount).rounded()
+            let steps = distance - wraps * Self.crownDetentCount
+            // Limit a coalesced input update to two detents in either direction.
+            let change = min(2, max(-2, steps)) * Self.volumePerDetent
             let baseline = targetVolume ?? media.v
-            let volume = min(1, max(0, baseline + (new - old) * 0.05))
+            let volume = min(1, max(0, baseline + change))
             guard volume != baseline else { return }
             targetVolume = volume
             link.sendMediaVolume(volume)

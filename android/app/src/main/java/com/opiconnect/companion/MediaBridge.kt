@@ -13,6 +13,7 @@ import android.util.Log
 import com.opiconnect.companion.core.Messages
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.roundToInt
 
 // Mirrors the phone's media session to the watch and executes watch media commands.
 // We can read sessions because OpiConnect is an enabled notification listener.
@@ -43,12 +44,7 @@ object MediaBridge {
         MediaSessionManager.OnActiveSessionsChangedListener { list -> onSessionsChanged(list) }
 
     private val sendDebounced = Runnable {
-        context?.let { ctx ->
-            val s = _state.value
-            LinkService.instance?.sendAll(
-                Messages.MediaState(s.on, s.app, s.title, s.artist, s.playing, s.volume),
-            )
-        }
+        if (context != null) sendStateNow()
     }
 
     fun start(context: Context) {
@@ -115,9 +111,7 @@ object MediaBridge {
             it.playbackState?.state == PlaybackState.STATE_PLAYING
         }
         val controller = playing ?: controllers.values.firstOrNull()
-        val am = ctx.getSystemService(AudioManager::class.java)
-        val max = am?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 1
-        val vol = if (max > 0) (am?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0).toFloat() / max else 0f
+        val vol = ctx.getSystemService(AudioManager::class.java)?.let(::musicVolume) ?: 0f
         if (controller == null) {
             _state.value = State(volume = vol)
             return
@@ -138,6 +132,11 @@ object MediaBridge {
             ctx.packageManager.getApplicationInfo(pkg, 0),
         ).toString()
     }.getOrDefault(pkg)
+
+    private fun musicVolume(am: AudioManager): Float {
+        val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        return if (max > 0) am.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / max else 0f
+    }
 
     // MARK: commands from the watch
 
@@ -160,19 +159,26 @@ object MediaBridge {
             "next" -> controller?.transportControls?.skipToNext()
             "prev" -> controller?.transportControls?.skipToPrevious()
             "vol" -> {
+                val target = v ?: 0f
+                if (!target.isFinite()) return
                 val am = ctx.getSystemService(AudioManager::class.java) ?: return
-                val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-                am.setStreamVolume(
-                    AudioManager.STREAM_MUSIC,
-                    ((v ?: 0f).coerceIn(0f, 1f) * max).toInt(), 0,
-                )
+                val stream = AudioManager.STREAM_MUSIC
+                val index = (target.coerceIn(0f, 1f) * am.getStreamMaxVolume(stream)).roundToInt()
+                try {
+                    am.setStreamVolume(stream, index, 0)
+                } catch (e: SecurityException) {
+                    Log.w(TAG, "Couldn't set media volume", e)
+                }
+                _state.value = _state.value.copy(volume = musicVolume(am))
+                handler.removeCallbacks(sendDebounced)
+                sendStateNow()
+                return
             }
         }
         scheduleUpdate()
     }
 
-    // Push the current state to a connection right after hello.
-    fun sendStateNow() {
+    private fun sendStateNow() {
         val s = _state.value
         LinkService.instance?.sendAll(
             Messages.MediaState(s.on, s.app, s.title, s.artist, s.playing, s.volume),

@@ -151,6 +151,13 @@ Phone → watch:
 | `findphone_state` | `{"type":"findphone_state","on":<bool>}` | whether the phone is currently ringing |
 | `cal`     | `{"type":"cal","h":"<hash>","from":<ms>,"to":<ms>,"ev":[...]}` | calendar events, see below |
 
+For `media` with `cmd="vol"`, `v` is the target fraction of the maximum music stream
+volume. Android rounds it to the nearest volume index and publishes `media_state` with
+the volume read back from the system after processing the command. While the crown is
+turning, the watch sends at most one volume command per 100 ms and replaces any unsent
+volume command with the latest target. Pending volume commands are scoped to the live
+connection and the Now Playing screen.
+
 ### Calendar (`cal` message)
 
 `ev` is a list of event objects (max 300, sorted by `s` then `k`):

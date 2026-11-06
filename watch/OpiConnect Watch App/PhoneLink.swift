@@ -54,6 +54,10 @@ final class PhoneLink: NSObject, ObservableObject {
     private var chunkQueue: [Data] = []       // chunks of the message being written
     private var messageQueue: [Data] = []     // sealed messages waiting / in flight
     private var writingQueueMessage = false   // current message came from PendingQueue
+    private var receivedMediaState = false
+    private var pendingMediaVolume: Double?
+    private var nextMediaVolumeWrite = DispatchTime.now()
+    private var mediaVolumeWakeup: DispatchWorkItem?
 
     override init() {
         super.init()
@@ -103,6 +107,7 @@ final class PhoneLink: NSObject, ObservableObject {
     func goBackground() {
         guard !DemoMode.isActive else { return }
         appState = "background"
+        cancelPendingMediaVolume()
         guard status == .authenticated else {
             if PendingQueue.shared.count == 0 {
                 disconnect()
@@ -126,10 +131,54 @@ final class PhoneLink: NSObject, ObservableObject {
     // MARK: outbound
 
     func send(_ message: BLEMessage) {
-        guard let plaintext = try? message.encode(),
-              let sealed = try? OpiCrypto.seal(plaintext, using: PairingKeys.shared.encKey) else { return }
+        guard let sealed = seal(message) else { return }
         messageQueue.append(sealed)
         pumpWrites()
+    }
+
+    private func seal(_ message: BLEMessage) -> Data? {
+        guard let plaintext = try? message.encode() else { return nil }
+        return try? OpiCrypto.seal(plaintext, using: PairingKeys.shared.encKey)
+    }
+
+    var canAdjustMediaVolume: Bool {
+        canWrite && appState == "active" && (receivedMediaState || DemoMode.isActive)
+    }
+
+    func sendMediaVolume(_ volume: Double) {
+        guard canAdjustMediaVolume else { return }
+        if DemoMode.isActive {
+            AppModel.shared.media?.v = volume
+            return
+        }
+        pendingMediaVolume = volume
+        pumpWrites()
+    }
+
+    func cancelPendingMediaVolume() {
+        pendingMediaVolume = nil
+        mediaVolumeWakeup?.cancel()
+        mediaVolumeWakeup = nil
+    }
+
+    private func takeMediaVolume() -> Data? {
+        guard canAdjustMediaVolume, let volume = pendingMediaVolume else { return nil }
+        let now = DispatchTime.now()
+        guard now >= nextMediaVolumeWrite else {
+            if mediaVolumeWakeup == nil {
+                let item = DispatchWorkItem { [weak self] in
+                    self?.mediaVolumeWakeup = nil
+                    self?.pumpWrites()
+                }
+                mediaVolumeWakeup = item
+                DispatchQueue.main.asyncAfter(deadline: nextMediaVolumeWrite, execute: item)
+            }
+            return nil
+        }
+        // Start the interval when the write starts, so a busy link can't build a backlog.
+        cancelPendingMediaVolume()
+        nextMediaVolumeWrite = now + .milliseconds(100)
+        return seal(.media(cmd: "vol", v: volume))
     }
 
     // Flush persisted queue (dismiss/action). Items are removed once their final
@@ -158,6 +207,9 @@ final class PhoneLink: NSObject, ObservableObject {
                   let sealed = try? OpiCrypto.seal(plaintext, using: PairingKeys.shared.encKey) {
             chunkQueue = Chunker.split(sealed, maxLen: max(2, maxLen))
             writingQueueMessage = true
+        } else if let sealed = takeMediaVolume() {
+            chunkQueue = Chunker.split(sealed, maxLen: max(2, maxLen))
+            writingQueueMessage = false
         } else {
             return
         }
@@ -209,8 +261,15 @@ final class PhoneLink: NSObject, ObservableObject {
         case .status(let bt, let bc):
             AppModel.shared.updateStatus(bt: bt, bc: bc)
         case .mediaState(let snapshot):
+            receivedMediaState = true
+            let previous = AppModel.shared.media
             AppModel.shared.media = snapshot
-            AppModel.shared.store.saveMedia(snapshot)
+            // The music widget only displays the session, track and artist.
+            if previous?.on == snapshot.on, previous?.t == snapshot.t, previous?.ar == snapshot.ar {
+                AppModel.shared.store.write(.media, snapshot)
+            } else {
+                AppModel.shared.store.saveMedia(snapshot)
+            }
         case .findphoneState(let on):
             AppModel.shared.ringing = on
         case .cal(let cache):
@@ -242,6 +301,9 @@ final class PhoneLink: NSObject, ObservableObject {
     }
 
     private func cleanupConnection() {
+        cancelPendingMediaVolume()
+        receivedMediaState = false
+        nextMediaVolumeWrite = .now()
         peripheral = nil
         rx = nil
         chunkQueue.removeAll()

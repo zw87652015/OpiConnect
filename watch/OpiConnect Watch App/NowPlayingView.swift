@@ -2,9 +2,10 @@ import SwiftUI
 
 struct NowPlayingView: View {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var link = PhoneLink.shared
-    @State private var volume: Double = 0
-    @State private var crownIdle: DispatchWorkItem?
+    @State private var crownOffset = 0.0
+    @State private var targetVolume: Double?
     @FocusState private var crownFocused: Bool
 
     private var media: MediaSnapshot? { model.media }
@@ -35,41 +36,56 @@ struct NowPlayingView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
+            if link.canAdjustMediaVolume, let media {
+                volumeIndicator(media.v)
+            }
         }
         .navigationTitle("Now Playing")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .focusable()
         .focused($crownFocused)
         .focusEffectDisabled()
-        .digitalCrownRotation(
-            $volume,
-            from: 0, through: 1, by: 0.05,
-            sensitivity: .medium,
-            isContinuous: false,
-            isHapticFeedbackEnabled: true,
-        )
-        .onChange(of: volume) { _, v in
-            // Skip echoes: a phone-side volume update shouldn't bounce back as a command.
-            guard abs(v - (media?.v ?? -1)) >= 0.001 else { return }
-            // Send volume changes debounced at 200 ms.
-            crownIdle?.cancel()
-            let item = DispatchWorkItem {
-                link.send(.media(cmd: "vol", v: v))
-                crownIdle = nil
-            }
-            crownIdle = item
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: item)
+        // Keep the system's crown position separate from the phone's volume.
+        .digitalCrownRotation($crownOffset, onIdle: { targetVolume = nil })
+        .onChange(of: crownOffset) { old, new in
+            guard scenePhase == .active, link.canAdjustMediaVolume, let media else { return }
+            let baseline = targetVolume ?? media.v
+            let volume = min(1, max(0, baseline + (new - old) * 0.05))
+            guard volume != baseline else { return }
+            targetVolume = volume
+            link.sendMediaVolume(volume)
         }
-        .onChange(of: media?.v) { _, v in
-            // Don't fight a crown turn in progress; otherwise track the phone's volume.
-            guard let v, crownIdle == nil else { return }
-            volume = v
+        .onChange(of: link.status) { _, status in
+            if status != .authenticated { stopAdjustingVolume() }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { stopAdjustingVolume() }
         }
         .onAppear {
             link.start(state: "active")
             crownFocused = true
-            if let m = media { volume = m.v }
         }
+        .onDisappear { stopAdjustingVolume() }
+    }
+
+    private func volumeIndicator(_ volume: Double) -> some View {
+        let percent = volume.formatted(.percent.precision(.fractionLength(0)))
+        return HStack(spacing: 6) {
+            Image(systemName: volume == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill")
+            ProgressView(value: volume)
+                .progressViewStyle(.linear)
+            Text(verbatim: percent)
+                .monospacedDigit()
+        }
+        .font(.caption2)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Volume")
+        .accessibilityValue(Text(verbatim: percent))
+    }
+
+    private func stopAdjustingVolume() {
+        targetVolume = nil
+        link.cancelPendingMediaVolume()
     }
 
     private func send(_ cmd: String) {

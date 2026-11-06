@@ -19,7 +19,8 @@ struct OpiConnectApp: App {
                 PhoneLink.shared.start(state: "active")
                 Task { await model.refreshSubscription() }
                 // The NSE/AppDelegate may have set the flag while we were suspended.
-                if !model.paired && UserDefaults.appGroup.bool(forKey: "opi.paired") { model.paired = true }
+                if UserDefaults.appGroup.bool(forKey: "opi.paired") { model.markPaired() }
+                RelayRegistration.shared.resume()
                 model.reload()
             case .background:
                 PhoneLink.shared.goBackground()

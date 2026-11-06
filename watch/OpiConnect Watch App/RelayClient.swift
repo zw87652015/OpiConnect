@@ -19,10 +19,15 @@ enum RelayClient {
         }
     }
 
-    static func register(token: String, env: String) async throws {
+    static func register(pairId: String, secret: String, token: String) async throws {
+        #if DEBUG
+        let env = "sandbox"
+        #else
+        let env = "production"
+        #endif
         try await post("/v1/register", [
-            "pairId": PairingKeys.shared.pairId,
-            "secret": PairingKeys.shared.secret,
+            "pairId": pairId,
+            "secret": secret,
             "token": token,
             "env": env,
         ])

@@ -4,10 +4,6 @@ import UserNotifications
 
 final class AppDelegate: NSObject, WKApplicationDelegate {
     static let refreshTaskId = "opi.refresh"
-    private var lastRegisteredKey: String? {
-        get { UserDefaults.appGroup.string(forKey: "opi.registered") }
-        set { UserDefaults.appGroup.set(newValue, forKey: "opi.registered") }
-    }
 
     func applicationDidFinishLaunching() {
         // Demo mode: no permission prompts and no APNs registration.
@@ -15,36 +11,18 @@ final class AppDelegate: NSObject, WKApplicationDelegate {
         AppModel.shared.startSubscriptionUpdates()
         let center = UNUserNotificationCenter.current()
         center.delegate = self
-        center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
-        WKApplication.shared().registerForRemoteNotifications()
+        UserDefaults.appGroup.removeObject(forKey: "opi.registered")
+        Task { @MainActor in
+            _ = try? await center.requestAuthorization(options: [.alert, .sound])
+            RelayRegistration.shared.start()
+        }
     }
 
     func didRegisterForRemoteNotifications(withDeviceToken deviceToken: Data) {
-        let token = deviceToken.map { String(format: "%02x", $0) }.joined()
-        let pairId = PairingKeys.shared.pairId
-        let key = "\(pairId)|\(token)"
-        guard key != lastRegisteredKey else {
-            AppModel.shared.relayRegistered = true
-            return
-        }
-        #if DEBUG
-        let env = "sandbox"
-        #else
-        let env = "production"
-        #endif
-        Task {
-            do {
-                try await RelayClient.register(token: token, env: env)
-                lastRegisteredKey = key
-                AppModel.shared.relayRegistered = true
-            } catch {
-                AppModel.shared.relayRegistered = false
-            }
-        }
+        RelayRegistration.shared.receivedDeviceToken(deviceToken)
     }
 
     func didFailToRegisterForRemoteNotificationsWithError(_ error: Error) {
-        AppModel.shared.relayRegistered = false
         NSLog("[opi] remote notification registration failed: \(error.localizedDescription)")
     }
 

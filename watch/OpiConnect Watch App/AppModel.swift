@@ -1,7 +1,6 @@
 import Foundation
 import StoreKit
 import UserNotifications
-import WatchKit
 import WidgetKit
 
 struct NotifItem: Identifiable, Equatable {
@@ -94,6 +93,7 @@ final class AppModel: ObservableObject {
         guard !paired else { return }
         UserDefaults.appGroup.set(true, forKey: "opi.paired")
         paired = true
+        RelayRegistration.shared.retryNow()
     }
 
     func insert(_ payload: NotifPayload) {
@@ -148,18 +148,14 @@ final class AppModel: ObservableObject {
     }
 
     func unpair() {
-        // Unregister with the OLD credentials before the key is reset.
         let oldPairId = PairingKeys.shared.pairId
         let oldSecret = PairingKeys.shared.secret
-        Task { try? await RelayClient.unregister(pairId: oldPairId, secret: oldSecret) }
         UserDefaults.appGroup.set(false, forKey: "opi.paired")
-        UserDefaults.appGroup.removeObject(forKey: "opi.registered")
         PendingQueue.shared.clear()
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         PhoneLink.shared.disconnect()
         PairingKeys.shared.reset()
         paired = false
-        relayRegistered = false
         items = []
         phoneStatus = nil
         media = nil
@@ -169,7 +165,9 @@ final class AppModel: ObservableObject {
         Task { await CalendarReminders.clear() }
         // The new pairId needs a fresh relay registration, and the pairing
         // screen should resume scanning for the phone.
-        WKApplication.shared().registerForRemoteNotifications()
+        RelayRegistration.shared.pairingDidReset {
+            try? await RelayClient.unregister(pairId: oldPairId, secret: oldSecret)
+        }
         PhoneLink.shared.start(state: "active")
     }
 }

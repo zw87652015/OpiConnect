@@ -97,8 +97,8 @@ enum DemoMode {
             return
         }
         model.paired = true
-        // "paywall" previews the locked state; every other route acts subscribed.
-        model.subscribed = route != "paywall"
+        // "paywall"/"plans" preview the locked state; every other route acts subscribed.
+        model.subscribed = route != "paywall" && route != "plans"
         switch route {
         case "detail":
             model.path = [.detail(id: model.items.first?.id ?? "")]

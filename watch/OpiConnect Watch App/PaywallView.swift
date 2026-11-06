@@ -9,17 +9,11 @@ struct PaywallView: View {
     var body: some View {
         NavigationStack {
             SubscriptionStoreView(productIDs: Subscription.productIDs) {
-                VStack(spacing: 6) {
-                    Text("OpiLink")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                    Text("Android notifications on your wrist")
-                    Text("Find Phone, music and calendar")
-                    Text("End-to-end encrypted")
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding()
+                #if DEBUG
+                if DemoMode.isActive && DemoMode.route == "plans" { EmptyView() } else { header }
+                #else
+                header
+                #endif
             }
             .subscriptionStorePolicyDestination(url: Subscription.termsURL, for: .termsOfService)
             .subscriptionStorePolicyDestination(url: Subscription.privacyURL, for: .privacyPolicy)
@@ -37,5 +31,19 @@ struct PaywallView: View {
                 }
             }
         }
+    }
+
+    private var header: some View {
+        VStack(spacing: 6) {
+            Text("OpiLink")
+                .font(.headline)
+                .foregroundStyle(.primary)
+            Text("Android notifications on your wrist")
+            Text("Find Phone, music and calendar")
+            Text("End-to-end encrypted")
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .padding()
     }
 }

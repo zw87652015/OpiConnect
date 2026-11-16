@@ -150,9 +150,3 @@ handshake completes — keep the watch app open and near the phone during pairin
 
 The OpiLink name and app icon are not covered by the license. Forks must use a different
 name and icon.
-
-## Contributing
-
-By submitting a contribution you agree that it may be distributed under the project's
-current license and any future license the maintainer chooses, including in the paid
-App Store build.
